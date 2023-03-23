@@ -412,4 +412,8 @@ public class UserService {
             return options;
         });
     }
+
+    public void update(AuthUser user) {
+        userRepository.save(user);
+    }
 }

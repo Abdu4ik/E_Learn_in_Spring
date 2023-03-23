@@ -3,6 +3,7 @@ package com.tafakkoor.e_learn.utils;
 import com.google.gson.Gson;
 import com.tafakkoor.e_learn.domain.AuthUser;
 import com.tafakkoor.e_learn.domain.Token;
+import com.tafakkoor.e_learn.enums.Levels;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -87,6 +88,24 @@ public class Util {
             }
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid input string. Must be in scientific notation.");
+        }
+    }
+
+    public Levels determineLevel(int score) {
+        if (score <= 5) {
+            return Levels.BEGINNER;
+        } else if (score <= 11) {
+            return Levels.ELEMENTARY;
+        } else if (score <= 16) {
+            return Levels.PRE_INTERMEDIATE;
+        } else if (score <= 20) {
+            return Levels.INTERMEDIATE;
+        } else if (score <= 25) {
+            return Levels.UPPER_INTERMEDIATE;
+        } else if (score <= 27) {
+            return Levels.ADVANCED;
+        } else {
+            return Levels.PROFICIENCY;
         }
     }
 
