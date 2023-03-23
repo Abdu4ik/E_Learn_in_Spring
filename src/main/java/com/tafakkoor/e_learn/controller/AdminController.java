@@ -1,11 +1,8 @@
 package com.tafakkoor.e_learn.controller;
 
 import com.tafakkoor.e_learn.domain.AuthUser;
-import com.tafakkoor.e_learn.enums.Levels;
 import com.tafakkoor.e_learn.enums.Roles;
 import com.tafakkoor.e_learn.services.UserService;
-import lombok.Builder;
-import lombok.Getter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +30,7 @@ public class AdminController {
         modelAndView.setViewName("admin/adminpage");
         return modelAndView;
     }
+
     @PostMapping("/admin/updateStatus")
     public String updateStatus(@RequestParam("updated_id") Long id) {
         userService.updateStatus(id);

@@ -12,7 +12,7 @@ import lombok.*;
 @ToString
 @Builder
 @Entity
-public class Content extends Auditable{
+public class Content extends Auditable {
     @Column(name = "title", nullable = false)
     private String title;
     @Column(name = "author", nullable = false)

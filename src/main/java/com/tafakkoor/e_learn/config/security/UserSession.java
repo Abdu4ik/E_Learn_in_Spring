@@ -26,6 +26,7 @@ public class UserSession {
             return user.getId();
         return null;
     }
+
     public Levels getLevel() {
         AuthUser user = getUser();
         if (user != null)

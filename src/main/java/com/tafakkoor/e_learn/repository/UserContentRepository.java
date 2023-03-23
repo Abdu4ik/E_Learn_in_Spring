@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface UserContentRepository extends JpaRepository<UserContent, Long> {
-    List<UserContent> findByUserIdAndProgress( Long userId, Progress progress);
+    List<UserContent> findByUserIdAndProgress(Long userId, Progress progress);
 
 }

@@ -5,13 +5,10 @@ import com.tafakkoor.e_learn.domain.AuthUser;
 import com.tafakkoor.e_learn.domain.Content;
 import com.tafakkoor.e_learn.enums.Levels;
 import com.tafakkoor.e_learn.services.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
-import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -55,7 +52,6 @@ public class UserController {
         modelAndView.addObject("levels", levelsList);
         return modelAndView;
     }
-
 
 
     @GetMapping("/practise/story/{level}")
@@ -111,8 +107,6 @@ public class UserController {
         modelAndView.addObject("grammars", contents);
         return modelAndView;
     }
-
-
 
 
     public boolean checkLevel(@NonNull Levels level, @NonNull Levels userLevel) {

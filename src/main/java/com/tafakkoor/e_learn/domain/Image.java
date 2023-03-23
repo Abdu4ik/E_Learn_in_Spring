@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Image extends Auditable{
+public class Image extends Auditable {
     private String generatedFileName;
     private String originalFileName;
     @Column(columnDefinition = "TEXT", nullable = false)

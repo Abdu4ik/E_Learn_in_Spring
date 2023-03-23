@@ -1,5 +1,6 @@
 package com.tafakkoor.e_learn.services;
 
+import com.google.gson.Gson;
 import com.tafakkoor.e_learn.domain.AuthUser;
 import com.tafakkoor.e_learn.domain.Content;
 import com.tafakkoor.e_learn.domain.Image;
@@ -15,16 +16,17 @@ import com.tafakkoor.e_learn.repository.TokenRepository;
 import com.tafakkoor.e_learn.repository.UserContentRepository;
 import com.tafakkoor.e_learn.utils.Util;
 import com.tafakkoor.e_learn.utils.mail.EmailService;
+import com.tafakkoor.e_learn.vos.FacebookVO;
+import com.tafakkoor.e_learn.vos.GoogleVO;
+import com.tafakkoor.e_learn.vos.LinkedInVO;
 import lombok.NonNull;
-import org.aspectj.lang.annotation.Before;
-import org.hibernate.annotations.SelectBeforeUpdate;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -35,8 +37,9 @@ public class UserService {
     private final ImageService imageService;
     private final UserContentRepository userContentRepository;
     private final ContentRepository contentRepository;
+    private final Gson gson = Util.getInstance().getGson();
 
-    public UserService(AuthUserRepository userRepository, PasswordEncoder passwordEncoder, TokenRepository tokenRepository, TokenService tokenService , ImageService imageService, UserContentRepository userContentRepository, ContentRepository contentRepository) {
+    public UserService(AuthUserRepository userRepository, PasswordEncoder passwordEncoder, TokenRepository tokenRepository, TokenService tokenService, ImageService imageService, UserContentRepository userContentRepository, ContentRepository contentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
@@ -107,6 +110,7 @@ public class UserService {
         }
         return contentRepository.findByLevelAndContentTypeAndDeleted(level, ContentType.GRAMMAR, false);
     }
+
     public List<AuthUser> getAllUsers() {
         return userRepository.findByDeleted(false);
     }
@@ -114,10 +118,9 @@ public class UserService {
     public void updateStatus(Long id) {
         AuthUser byId = userRepository.findById(id);
         boolean blocked = byId.getStatus().equals(Status.BLOCKED);
-        if(blocked){
+        if (blocked) {
             byId.setStatus(Status.ACTIVE);
-        }
-        else{
+        } else {
             byId.setStatus(Status.BLOCKED);
         }
         userRepository.save(byId);
@@ -126,99 +129,102 @@ public class UserService {
     // Abdullo's code below that
 
 
-
-
     public boolean userExist(String username) {
         AuthUser user = userRepository.findByUsername(username);
         return user != null;
     }
 
-    public void saveGoogleUser(Map<String, Object> attributes) {
-        String picture = (String) attributes.get("picture");
-        Image imageBuild = Image.builder()
-                .mimeType("image/jpg")
-                .generatedFileName("google.jpg")
-                .originalFileName("google.jpg")
-                .filePath(picture)
-                .build();
-        String firstname = (String) attributes.get("given_name");
-        String lastname = (String) attributes.get("family_name");
-        String email = (String) attributes.get("email");
-        String username = (String) attributes.get("sub");
-
-        Image image = imageService.saveImage(imageBuild);
-//        Image finalImage = imageService.findById(image.getId());
-        String password = "the.Strongest.Password@Ever9";
-        AuthUser user = AuthUser.builder()
-                .username(username)
-                .password(passwordEncoder.encode(password))
-                .email(email)
-                .firstName(firstname)
-                .lastName(lastname)
-                .image(image)
-                .status(Status.ACTIVE)
-                .build();
-        userRepository.save(user);
-    }
-
-    public void saveFacebookUser(Map<String, Object> attributes) {
-        String fullName = (String) attributes.get("name");
-        String email = (String) attributes.get("email");
-        String username = (String) attributes.get("id");
-        String password = "the.Strongest.Password@Ever9";
-        String firstName = null;
-        String lastName = null;
-        String[] strings = fullName.split(" ");
-
-        if (strings.length == 2) {
-            firstName = strings[0];
-            lastName = strings[1];
-        } else firstName = strings[0];
-
-        AuthUser user = AuthUser.builder()
-                .username(username)
-                .password(passwordEncoder.encode(password))
-                .email(email)
-                .firstName(firstName)
-                .lastName(lastName)
-                .status(Status.ACTIVE)
-                .build();
-        userRepository.save(user);
-
-    }
-
-    public void saveLinkedinUser(Map<String, Object> attributes) {
-        attributes.entrySet().forEach(System.out::println);
-    }
-
-    /*public void saveGithubUser(Map<String, Object> attributes) {
-        String id = attributes.get("id").toString();
-        BigInteger username = Util.getInstance().convertToBigInteger(id);
-        System.out.println(username);
-//        String email = (String) attributes.get("email");
-//        String password = "the.Strongest.Password@Ever9";
-//        String firstName = (String) attributes.get("name");
-//        String lastName = null;
-//        String[] strings = firstName.split(" ");
-
-        for (Map.Entry<String, Object> stringObjectEntry : attributes.entrySet()) {
-            System.out.println(stringObjectEntry.getKey() + " : " + stringObjectEntry.getValue());
+    public void saveGoogleUser(String userInfo) {
+        Image image = null;
+        GoogleVO googleUser = gson.fromJson(userInfo, GoogleVO.class);
+        String email = googleUser.getEmail();
+        String username = googleUser.getSub();
+        if (userExist(username)) {
+            changeLastLogin(username);
+            return;
         }
 
-//        if (strings.length == 2) {
-//            firstName = strings[0];
-//            lastName = strings[1];
-//        } else firstName = strings[0];
+        if (googleUser.getPicture() != null)
+            image = imageService.buildAndSaveImage(googleUser.getPicture(), "google" + googleUser.getSub());
 
-//        AuthUser user = AuthUser.builder()
-//                .username(username)
-//                .password(passwordEncoder.encode(password))
-//                .email(email)
-//                .firstName(firstName)
-//                .lastName(lastName)
-//                .status(Status.ACTIVE)
-//                .build();
-//        userRepository.save(user);
-    }*/
+        String password = "the.Strongest.Password@Ever9";
+        AuthUser user = AuthUser.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .email(email)
+                .firstName(googleUser.getGiven_name())
+                .lastName(googleUser.getFamily_name())
+                .image(image)
+                .status(Status.ACTIVE)
+                .isOAuthUser(true)
+                .lastLogin(LocalDateTime.now(ZoneId.of("Asia/Tashkent")))
+                .build();
+        userRepository.save(user);
+    }
 
+    public void saveFacebookUser(String userInfo) {
+        Image image = null;
+        FacebookVO facebookUser = gson.fromJson(userInfo, FacebookVO.class);
+        String email = facebookUser.getEmail();
+        String username = facebookUser.getId();
+        if (userExist(username)) {
+            changeLastLogin(username);
+            return;
+        }
+
+        if (facebookUser.getPicture_large() != null)
+            image = imageService.buildAndSaveImage(facebookUser.getPicture_large().getData().getUrl(), "facebook" + facebookUser.getId());
+
+        String password = "the.Strongest.Password@Ever9";
+        AuthUser user = AuthUser.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .email(email)
+                .firstName(facebookUser.getFirst_name())
+                .lastName(facebookUser.getLast_name())
+                .image(image)
+                .status(Status.ACTIVE)
+                .lastLogin(LocalDateTime.now(ZoneId.of("Asia/Tashkent")))
+                .isOAuthUser(true)
+                .build();
+        userRepository.save(user);
+    }
+
+    public String saveLinkedinUser(String userInfo) {
+        Image image = null;
+        LinkedInVO linkedInUser = gson.fromJson(userInfo, LinkedInVO.class);
+        String email = linkedInUser.getEmail();
+        String username = linkedInUser.getSub();
+        if (userExist(username)) {
+            changeLastLogin(username);
+            return username;
+        }
+
+        if (linkedInUser.getPicture() != null)
+            image = imageService.buildAndSaveImage(linkedInUser.getPicture(), "linkedIn" + username);
+        String password = "the.Strongest.Password@Ever9";
+        AuthUser user = AuthUser.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .email(email)
+                .firstName(linkedInUser.getGiven_name())
+                .lastName(linkedInUser.getFamily_name())
+                .image(image)
+                .status(Status.ACTIVE)
+                .lastLogin(LocalDateTime.now(ZoneId.of("Asia/Tashkent")))
+                .isOAuthUser(true)
+                .build();
+        userRepository.save(user);
+        return username;
+    }
+
+    public void changeLastLogin(String username) {
+        AuthUser user = userRepository.findByUsername(username);
+        user.setLastLogin(LocalDateTime.now(ZoneId.of("Asia/Tashkent")));
+        userRepository.save(user);
+    }
+
+    public AuthUser getUser(String username) {
+        return userRepository.findByUsername(username);
+    }
 }

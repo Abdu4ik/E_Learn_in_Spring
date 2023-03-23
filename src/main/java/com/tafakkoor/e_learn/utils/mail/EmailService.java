@@ -10,7 +10,8 @@ import java.util.Properties;
 
 public class EmailService {
     private static final ThreadLocal<EmailService> EMAIL_SERVICE_THREAD_LOCAL = ThreadLocal.withInitial(EmailService::new);
-    public void sendEmail( String email, String body, String subject) {
+
+    public void sendEmail(String email, String body, String subject) {
         String from = "strengthnumberone@gmail.com";
         String host = "smtp.gmail.com";
 
@@ -38,12 +39,13 @@ public class EmailService {
             ex.printStackTrace();
         }
     }
+
     public static EmailService getInstance() {
         return EMAIL_SERVICE_THREAD_LOCAL.get();
     }
 
 
-    public static void main( String[] args ) {
+    public static void main(String[] args) {
 
     }
 }

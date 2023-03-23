@@ -13,7 +13,7 @@ import lombok.*;
 
 
 public class Questions extends Auditable {
-    @Column( nullable = false )
+    @Column(nullable = false)
     private String title;
     @JoinColumn(name = "content_id")
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
