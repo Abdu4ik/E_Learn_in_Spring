@@ -23,4 +23,5 @@ public interface VocabularyRepository extends JpaRepository<Vocabulary, Long> {
     @Transactional
     @Query(value = "UPDATE Vocabulary SET deleted = true, deleted_at=now(), deleted_by=?1 WHERE id = ?2" , nativeQuery = true)
     void setAsDelete(Long userId, Long id);
+
 }

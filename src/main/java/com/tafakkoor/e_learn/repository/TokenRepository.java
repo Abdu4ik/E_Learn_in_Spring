@@ -12,12 +12,12 @@ public interface TokenRepository extends JpaRepository<Token, AuthUser> {
     @Query("DELETE FROM Token u WHERE (u.createdAt + INTERVAL ('10 MINUTE')) <= NOW()")
     int deleteByCreatedAtBefore();
 
-    Optional<Token> findByUser( AuthUser user );
+    Optional<Token> findByUser(AuthUser user);
 
-    Optional<Token> findByToken( String token );
+    Optional<Token> findByToken(String token);
 
 
-     static void main( String[] args ) {
+    static void main(String[] args) {
 
     }
 

@@ -1,10 +1,7 @@
 package com.tafakkoor.e_learn.services;
 
+import com.google.gson.Gson;
 import com.tafakkoor.e_learn.domain.*;
-import com.tafakkoor.e_learn.domain.AuthUser;
-import com.tafakkoor.e_learn.domain.Content;
-import com.tafakkoor.e_learn.domain.Image;
-import com.tafakkoor.e_learn.domain.UserContent;
 import com.tafakkoor.e_learn.dto.UserRegisterDTO;
 import com.tafakkoor.e_learn.enums.ContentType;
 import com.tafakkoor.e_learn.enums.Levels;
@@ -13,18 +10,24 @@ import com.tafakkoor.e_learn.enums.Status;
 import com.tafakkoor.e_learn.repository.*;
 import com.tafakkoor.e_learn.utils.Util;
 import com.tafakkoor.e_learn.utils.mail.EmailService;
+import com.tafakkoor.e_learn.vos.FacebookVO;
+import com.tafakkoor.e_learn.vos.GoogleVO;
+import com.tafakkoor.e_learn.vos.LinkedInVO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 @Service
 public class UserService {
@@ -36,6 +39,10 @@ public class UserService {
     private final ContentRepository contentRepository;
     private final CommentRepository commentRepository;
     private final VocabularyRepository vocabularyRepository;
+    private final QuestionsRepository questionRepository;
+    private final OptionRepository optionRepository;
+
+    private final Gson gson = Util.getInstance().getGson();
 
     public UserService(AuthUserRepository userRepository,
                        PasswordEncoder passwordEncoder,
@@ -44,7 +51,8 @@ public class UserService {
                        UserContentRepository userContentRepository,
                        ContentRepository contentRepository,
                        CommentRepository commentRepository,
-                       VocabularyRepository vocabularyRepository, ImageService imageService) {
+                       VocabularyRepository vocabularyRepository, ImageService imageService, QuestionsRepository questionRepository, OptionRepository optionRepository) {
+        this.questionRepository = questionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
@@ -53,6 +61,7 @@ public class UserService {
         this.contentRepository = contentRepository;
         this.commentRepository = commentRepository;
         this.vocabularyRepository = vocabularyRepository;
+        this.optionRepository = optionRepository;
     }
 
     public List<Levels> getLevels(@NonNull Levels level) {
@@ -114,7 +123,6 @@ public class UserService {
         return modelAndView;
     }
 
-
     public UserContent checkUserStatus(Long id) {
         return userContentRepository.findByUserIdAndProgressOrProgress(id, Progress.IN_PROGRESS, Progress.TAKE_TEST);
     }
@@ -136,6 +144,8 @@ public class UserService {
         Optional<Content> content = contentRepository.findById(Long.valueOf(storyId));
         return Optional.empty();
     }
+
+
 
     public List<AuthUser> getAllUsers() {
         return userRepository.findByDeleted(false);
@@ -184,62 +194,98 @@ public class UserService {
         return user != null;
     }
 
-    public void saveGoogleUser(Map<String, Object> attributes) {
-        String picture = (String) attributes.get("picture");
-        Image imageBuild = Image.builder()
-                .mimeType("image/jpg")
-                .generatedFileName("google.jpg")
-                .originalFileName("google.jpg")
-                .filePath(picture)
-                .build();
-        String firstname = (String) attributes.get("given_name");
-        String lastname = (String) attributes.get("family_name");
-        String email = (String) attributes.get("email");
-        String username = (String) attributes.get("sub");
+    public void saveGoogleUser(String userInfo) {
+        Image image = null;
+        GoogleVO googleUser = gson.fromJson(userInfo, GoogleVO.class);
+        String email = googleUser.getEmail();
+        String username = googleUser.getSub();
+        if (userExist(username)) {
+            changeLastLogin(username);
+            return;
+        }
 
-        Image image = imageService.saveImage(imageBuild);
-//        Image finalImage = imageService.findById(image.getId());
+        if (googleUser.getPicture() != null)
+            image = imageService.buildAndSaveImage(googleUser.getPicture(), "google" + googleUser.getSub());
+
         String password = "the.Strongest.Password@Ever9";
         AuthUser user = AuthUser.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .email(email)
-                .firstName(firstname)
-                .lastName(lastname)
+                .firstName(googleUser.getGiven_name())
+                .lastName(googleUser.getFamily_name())
                 .image(image)
                 .status(Status.ACTIVE)
+                .isOAuthUser(true)
+                .lastLogin(LocalDateTime.now(ZoneId.of("Asia/Tashkent")))
                 .build();
         userRepository.save(user);
     }
 
-    public void saveFacebookUser(Map<String, Object> attributes) {
-        String fullName = (String) attributes.get("name");
-        String email = (String) attributes.get("email");
-        String username = (String) attributes.get("id");
+    public void saveFacebookUser(String userInfo) {
+        Image image = null;
+        FacebookVO facebookUser = gson.fromJson(userInfo, FacebookVO.class);
+        String email = facebookUser.getEmail();
+        String username = facebookUser.getId();
+        if (userExist(username)) {
+            changeLastLogin(username);
+            return;
+        }
+
+        if (facebookUser.getPicture_large() != null)
+            image = imageService.buildAndSaveImage(facebookUser.getPicture_large().getData().getUrl(), "facebook" + facebookUser.getId());
+
         String password = "the.Strongest.Password@Ever9";
-        String firstName = null;
-        String lastName = null;
-        String[] strings = fullName.split(" ");
-
-        if (strings.length == 2) {
-            firstName = strings[0];
-            lastName = strings[1];
-        } else firstName = strings[0];
-
         AuthUser user = AuthUser.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .email(email)
-                .firstName(firstName)
-                .lastName(lastName)
+                .firstName(facebookUser.getFirst_name())
+                .lastName(facebookUser.getLast_name())
+                .image(image)
                 .status(Status.ACTIVE)
+                .lastLogin(LocalDateTime.now(ZoneId.of("Asia/Tashkent")))
+                .isOAuthUser(true)
                 .build();
         userRepository.save(user);
-
     }
 
-    public void saveLinkedinUser(Map<String, Object> attributes) {
-        attributes.entrySet().forEach(System.out::println);
+    public String saveLinkedinUser(String userInfo) {
+        Image image = null;
+        LinkedInVO linkedInUser = gson.fromJson(userInfo, LinkedInVO.class);
+        String email = linkedInUser.getEmail();
+        String username = linkedInUser.getSub();
+        if (userExist(username)) {
+            changeLastLogin(username);
+            return username;
+        }
+
+        if (linkedInUser.getPicture() != null)
+            image = imageService.buildAndSaveImage(linkedInUser.getPicture(), "linkedIn" + username);
+        String password = "the.Strongest.Password@Ever9";
+        AuthUser user = AuthUser.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .email(email)
+                .firstName(linkedInUser.getGiven_name())
+                .lastName(linkedInUser.getFamily_name())
+                .image(image)
+                .status(Status.ACTIVE)
+                .lastLogin(LocalDateTime.now(ZoneId.of("Asia/Tashkent")))
+                .isOAuthUser(true)
+                .build();
+        userRepository.save(user);
+        return username;
+    }
+
+    public void changeLastLogin(String username) {
+        AuthUser user = userRepository.findByUsername(username);
+        user.setLastLogin(LocalDateTime.now(ZoneId.of("Asia/Tashkent")));
+        userRepository.save(user);
+    }
+
+    public AuthUser getUser(String username) {
+        return userRepository.findByUsername(username);
     }
 
     public void updateRole(Long id, String role) {
@@ -287,10 +333,8 @@ public class UserService {
     public List<Vocabulary> mapRequestToVocabularyList(HttpServletRequest request, Content content, AuthUser authUser) {
         List<Vocabulary> vocabularyList = new ArrayList<>();
 
-        if (request.getParameter("word1") != null) {
-            for (int i = 0; i < 5; i++) {
-                vocabularyList.add(mapVocabulary(request, i + 1, authUser, content));
-            }
+        for (int i = 0; i < 5; i++) {
+            vocabularyList.add(mapVocabulary(request, i, authUser, content));
         }
         String[] uzbekWords = request.getParameterValues("uzbekWord");
         String[] englishWords = request.getParameterValues("englishWord");
@@ -315,7 +359,7 @@ public class UserService {
         return vocabularyList;
     }
 
-    public Vocabulary mapVocabulary(HttpServletRequest request, int i, AuthUser authUser, Content content) {
+    private Vocabulary mapVocabulary(HttpServletRequest request, int i, AuthUser authUser, Content content) {
         return Vocabulary.builder()
                 .word(request.getParameter("word" + i))
                 .translation(request.getParameter("translation" + i))
@@ -352,5 +396,24 @@ public class UserService {
         vocabulary.setTranslation(Objects.requireNonNullElse(request.getParameter("translation"), vocabulary.getTranslation()));
         vocabulary.setDefinition(Objects.requireNonNullElse(request.getParameter("definition"), vocabulary.getDefinition()));
         vocabularyRepository.updateVocabulary(vocabulary.getWord(), vocabulary.getTranslation(), vocabulary.getDefinition(), vocabulary.getId());
+    }
+
+    public CompletionStage<Object> getAllQuestions(Long id) {
+        return CompletableFuture.supplyAsync(() -> questionRepository.findAllByContentId(id));
+    }
+
+    public CompletionStage<Object> getAllOptions(Object questions) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<Questions> questionsList = (List<Questions>) questions;
+            List<Options> options = new ArrayList<>();
+            for (Questions question : questionsList) {
+                options.addAll(optionRepository.findAllByQuestionId(question.getId()));
+            }
+            return options;
+        });
+    }
+
+    public void update(AuthUser user) {
+        userRepository.save(user);
     }
 }

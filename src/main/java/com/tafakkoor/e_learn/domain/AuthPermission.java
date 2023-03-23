@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 @Builder
-public class AuthPermission extends Auditable{
+public class AuthPermission extends Auditable {
     @Column(nullable = false)
     private String name;
     @Column(nullable = false, unique = true)

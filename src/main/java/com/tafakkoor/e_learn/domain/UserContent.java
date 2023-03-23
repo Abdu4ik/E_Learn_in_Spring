@@ -14,7 +14,7 @@ import lombok.*;
 @ToString
 @Builder
 @Entity
-public class UserContent extends Auditable{
+public class UserContent extends Auditable {
     @JoinColumn(name = "auth_user_id")
     @ManyToOne
     private AuthUser user;

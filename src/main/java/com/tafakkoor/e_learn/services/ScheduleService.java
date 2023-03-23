@@ -54,8 +54,8 @@ public class ScheduleService {
     public void sendBirthdayEmails() { // done
         EmailService emailService = EmailService.getInstance();
 
-        List<AuthUser> users = authUserRepository.findAllByBirtDate(LocalDateTime.from(LocalDate.now()));
-        for ( AuthUser user : users ) {
+        List<AuthUser> users = authUserRepository.findAllByBirtDate(LocalDate.now());
+        for (AuthUser user : users) {
             CompletableFuture.runAsync(() -> emailService.sendEmail(user.getEmail(),
                     Util.getInstance().generateBodyForBirthDay(user.getUsername())
                     , "Happy Birthday"));

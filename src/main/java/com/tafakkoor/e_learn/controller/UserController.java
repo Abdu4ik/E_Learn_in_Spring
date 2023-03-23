@@ -7,6 +7,7 @@ import com.tafakkoor.e_learn.enums.ContentType;
 import com.tafakkoor.e_learn.enums.Levels;
 import com.tafakkoor.e_learn.enums.Progress;
 import com.tafakkoor.e_learn.services.UserService;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,10 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -59,6 +57,40 @@ public class UserController {
         List<Levels> levelsList = userService.getLevels(user.getLevel());
         modelAndView.addObject("levels", levelsList);
         return modelAndView;
+    }
+
+    @GetMapping({"/practise/grammar/test/{contentId}"})
+    public ModelAndView grammarTest(@PathVariable String contentId) {
+        ModelAndView modelAndView = new ModelAndView();
+        AuthUser user = userService.getUser(userSession.getId());
+        Optional<Content> content = userService.getContent(Long.parseLong(contentId));
+        if (content.isPresent()) {
+            modelAndView.setViewName("user/grammar/testGrammar");
+            userService.getAllQuestions(content.get().getId()).thenAccept(questions -> {
+                userService.getAllOptions(questions).thenAccept(options -> {
+                    modelAndView.addObject("options", options);
+                });
+                modelAndView.addObject("questions", questions);
+                modelAndView.addObject("grammarId", content.get().getId());
+                modelAndView.addObject("userId", user.getId());
+            });
+
+        } else {
+            modelAndView.addObject("flag", true);
+            modelAndView.addObject("levelNotFound", "Content not found");
+            modelAndView.setViewName("user/levelNotFound");
+        }
+        return modelAndView;
+    }
+
+    @PostMapping({"/practise/grammar/test"})
+    public ModelAndView grammarTestCheck(@RequestParam Quiz quiz) {
+        ModelAndView modelAndView = new ModelAndView();
+        //todo: check if the user has already done this quiz don't give him the score
+        //todo: check and save quiz
+        //todo: check if the user has done all the quizzes in this content give overall score like String score= "Score:"+ user.score; modelAndView.addObject("score", score);
+        return modelAndView;
+
     }
 
     @GetMapping({"/practise/story/{level}"})
@@ -136,6 +168,7 @@ public class UserController {
         AuthUser user = userService.getUser(userSession.getId());
         if (user != null && !user.getLevel().equals(Levels.DEFAULT)) {
             long id;
+
             try {
                 id = Long.parseLong(storyId);
             } catch (Exception var9) {
@@ -143,8 +176,14 @@ public class UserController {
                 modelAndView.setViewName("user/levelNotFound");
                 return modelAndView;
             }
+            UserContent statusContent = null;
 
-            UserContent statusContent = userService.checkUserStatus(userSession.getId());
+            try {
+
+                 statusContent = userService.checkUserStatus(userSession.getId());
+            }catch (Exception var8) {
+                var8.printStackTrace();
+            }
             if (statusContent != null && !Objects.equals(statusContent.getContent().getId(), id)) {
                 String var10001 = statusContent.getContent().getContentType().equals(ContentType.GRAMMAR) ? "grammars" : "stories";
                 modelAndView.setViewName("redirect:/practise/" + var10001 + "/" + statusContent.getContent().getId());
@@ -155,8 +194,6 @@ public class UserController {
                     modelAndView.setViewName("user/levelNotFound");
                 } else {
                     List<Comment> comments = userService.getComments(content.getId());
-                    List<Vocabulary> vocabularies = userService.getVocabularies(content.getId(), user);
-                    modelAndView.addObject("vocabularies", vocabularies);
                     modelAndView.addObject("userId", userSession.getId());
                     modelAndView.addObject("comments", comments);
                     modelAndView.addObject("content", content);
@@ -168,6 +205,7 @@ public class UserController {
         } else {
             modelAndView.addObject("levelNotFound", "You have not taken assessment test yet");
             modelAndView.setViewName("user/levelNotFound");
+
         }
         return modelAndView;
     }
@@ -188,6 +226,7 @@ public class UserController {
             modelAndView.setViewName("user/levelNotFound");
             return modelAndView;
         }
+
         Content content = userService.getStoryById(contentId);
         if (content == null) {
             modelAndView.addObject("levelNotFound", "Story not found ");
@@ -205,7 +244,7 @@ public class UserController {
     @PostMapping({"/practise/story/comments/delete/{id}"})
     public ModelAndView deleteComment(@PathVariable String id) {
         ModelAndView modelAndView = new ModelAndView();
-        long commentId ;
+        long commentId;
         try {
             commentId = Long.parseLong(id);
         } catch (Exception var6) {

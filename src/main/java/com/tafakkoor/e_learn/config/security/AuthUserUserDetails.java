@@ -74,6 +74,7 @@ public class AuthUserUserDetails implements UserDetails {
     public boolean isEnabled() {
         return Status.ACTIVE.equals(authUser.getStatus());
     }
+
     public void setLastLogin(LocalDateTime lastLogin) {
         authUser.setLastLogin(lastLogin);
     }
