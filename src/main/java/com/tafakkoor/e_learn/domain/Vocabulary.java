@@ -12,9 +12,10 @@ import lombok.*;
 @RequiredArgsConstructor
 @Builder
 public class Vocabulary extends Auditable {
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Content story;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     private AuthUser authUser;
     @Column(nullable = false)
     private String word;

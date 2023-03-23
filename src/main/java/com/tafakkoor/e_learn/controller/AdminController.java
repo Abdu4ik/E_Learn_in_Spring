@@ -36,4 +36,14 @@ public class AdminController {
         userService.updateStatus(id);
         return "redirect:/admin";
     }
+    @PostMapping("/admin/updateRole")
+    public String updateRole(@RequestParam("updated_id") Long id, @RequestParam("isAdmin") String role , @RequestParam("isTeacher") String role2) {
+        if(role.equals("ADMIN")){
+            userService.updateRole(id, role);
+        }
+        if(role2.equals("TEACHER")){
+            userService.updateRole(id, role2);
+        }
+        return "redirect:/admin";
+    }
 }

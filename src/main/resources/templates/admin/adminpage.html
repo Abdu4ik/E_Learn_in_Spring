@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/dataTables.bootstrap5.min.css"/>
 </head>
-<body >
+<body>
 <div th:replace="fragments :: navbar"></div>
 
 <div class="container mt-10">
@@ -37,30 +37,10 @@
             <td th:text="${user.getStatus()}"></td>
             <td>
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" id="dropdownMenuLink"
-                            data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-secondary " type="button" data-bs-target="#updateRole"
+                            data-bs-toggle="modal" th:onclick="changeRoleHelper([[${user.getId()}]])">
                         Change Role
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                        <button class="dropdown-item"
-                                type="button"
-                                data-bs-target="#changeRoleModal"
-                                data-bs-toggle="modal">
-                            USER
-                        </button>
-                        <button class="dropdown-item"
-                                type="button"
-                                data-bs-target="#changeRoleModal"
-                                data-bs-toggle="modal">
-                            TEACHER
-                        </button>
-                        <button class="dropdown-item"
-                                type="button"
-                                data-bs-target="#changeRoleModal"
-                                data-bs-toggle="modal">
-                            ADMIN
-                        </button>
-                    </div>
                 </div>
             </td>
             <td>
@@ -77,17 +57,55 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="updateStatus" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateStatus" tabindex="-1" aria-labelledby="updateStatusLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" action="admin/updateStatus">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Update user status</h5>
+                    <h5 class="modal-title" id="updateStatusLabel">Update user status</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <input type="hidden" name="updated_id" id="updated" >
+                <input type="hidden" name="updated_id" id="updated">
                 <div class="modal-body">
                     Do you really want to update status this user?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="updateRole" tabindex="-1" aria-labelledby="updateRoleLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="admin/updateRole">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateRoleLabel">Update user Role</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <input type="hidden" name="updated_id" id="updated_user">
+                <div class="modal-body">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="flexCheckDefault" disabled checked>
+                        <label class="form-check-label" for="flexCheckDefault">
+                            User
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="isAdmin" value="ADMIN" id="admin">
+                        <label class="form-check-label" for="admin">
+                            Admin
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="isTeacher" value="TEACHER" id="teacher">
+                        <label class="form-check-label" for="teacher">
+                            Teacher
+                        </label>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -4,6 +4,7 @@ import com.tafakkoor.e_learn.enums.ContentType;
 import com.tafakkoor.e_learn.enums.Levels;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Getter
 @Setter

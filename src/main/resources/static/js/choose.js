@@ -9,12 +9,11 @@ function choose(id, role) {
 let element = document.getElementById("v-activated");
 
 function changeActivatedHelperFunc(activated_id) {
-    console.log(activated_id);
     document.getElementById("updated").value = activated_id;
 }
 
 
-function changeDeletedHelper(deleted_id) {
-    document.getElementById("deleted_id").value = deleted_id;
+function changeRoleHelper(deleted_id) {
+    document.getElementById("updated_user").value = deleted_id;
 }
 

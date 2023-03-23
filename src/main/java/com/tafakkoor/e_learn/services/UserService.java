@@ -1,6 +1,5 @@
 package com.tafakkoor.e_learn.services;
 
-import com.google.gson.Gson;
 import com.tafakkoor.e_learn.domain.AuthUser;
 import com.tafakkoor.e_learn.domain.Content;
 import com.tafakkoor.e_learn.domain.Image;
@@ -10,24 +9,24 @@ import com.tafakkoor.e_learn.enums.ContentType;
 import com.tafakkoor.e_learn.enums.Levels;
 import com.tafakkoor.e_learn.enums.Progress;
 import com.tafakkoor.e_learn.enums.Status;
-import com.tafakkoor.e_learn.repository.AuthUserRepository;
-import com.tafakkoor.e_learn.repository.ContentRepository;
-import com.tafakkoor.e_learn.repository.TokenRepository;
-import com.tafakkoor.e_learn.repository.UserContentRepository;
+import com.tafakkoor.e_learn.repository.*;
 import com.tafakkoor.e_learn.utils.Util;
 import com.tafakkoor.e_learn.utils.mail.EmailService;
-import com.tafakkoor.e_learn.vos.FacebookVO;
-import com.tafakkoor.e_learn.vos.GoogleVO;
-import com.tafakkoor.e_learn.vos.LinkedInVO;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 @Service
 public class UserService {
@@ -37,15 +36,29 @@ public class UserService {
     private final ImageService imageService;
     private final UserContentRepository userContentRepository;
     private final ContentRepository contentRepository;
-    private final Gson gson = Util.getInstance().getGson();
+    private final CommentRepository commentRepository;
+    private final VocabularyRepository vocabularyRepository;
+    private final QuestionsRepository questionRepository;
+    private final OptionRepository optionRepository;
 
-    public UserService(AuthUserRepository userRepository, PasswordEncoder passwordEncoder, TokenRepository tokenRepository, TokenService tokenService, ImageService imageService, UserContentRepository userContentRepository, ContentRepository contentRepository) {
+    public UserService(AuthUserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       TokenRepository tokenRepository,
+                       TokenService tokenService,
+                       UserContentRepository userContentRepository,
+                       ContentRepository contentRepository,
+                       CommentRepository commentRepository,
+                       VocabularyRepository vocabularyRepository, ImageService imageService, QuestionsRepository questionRepository, OptionRepository optionRepository) {
+        this.questionRepository = questionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
         this.imageService = imageService;
         this.userContentRepository = userContentRepository;
         this.contentRepository = contentRepository;
+        this.commentRepository = commentRepository;
+        this.vocabularyRepository = vocabularyRepository;
+        this.optionRepository = optionRepository;
     }
 
     public List<Levels> getLevels(@NonNull Levels level) {
@@ -88,28 +101,48 @@ public class UserService {
         CompletableFuture.runAsync(() -> EmailService.getInstance().sendEmail(email, body, "Activate Email"));
     }
 
-    // Dilshod's code below
 
-
-    public List<Content> getContentsStories(Levels level, Long id) {
-        if (checkUserStatus(id)) {
-            return null;
+    public List<Content> getContentsStories(Levels level, Long id) throws RuntimeException {
+        UserContent userContent = checkUserStatus(id);
+        if (userContent != null) {
+            Content content = userContent.getContent();
+            throw new RuntimeException("You have a content in progress named \"%s\". Please complete the content first. id=%d".formatted(content.getTitle(), content.getId()));
         }
         return contentRepository.findByLevelAndContentTypeAndDeleted(level, ContentType.STORY, false);
     }
 
+    public ModelAndView getInProgressPage(ModelAndView modelAndView, Exception e) {
+        String eMessage = e.getMessage();
+        Long id = Long.parseLong(eMessage.substring(eMessage.indexOf("id") + 3));
+        modelAndView.addObject("inProgress", eMessage.substring(0, eMessage.indexOf("id")));
+        modelAndView.addObject("content", getContent(id).get());
+        modelAndView.setViewName("user/inProgress");
+        return modelAndView;
+    }
 
-    private boolean checkUserStatus(Long id) {
-        List<UserContent> userContents = userContentRepository.findByUserIdAndProgress(id, Progress.IN_PROGRESS);
-        return userContents.size() > 0;
+    public UserContent checkUserStatus(Long id) {
+        return userContentRepository.findByUserIdAndProgressOrProgress(id, Progress.IN_PROGRESS, Progress.TAKE_TEST);
     }
 
     public List<Content> getContentsGrammar(Levels level, Long id) {
-        if (checkUserStatus(id)) {
-            return null;
+        UserContent userContent = checkUserStatus(id);
+        if (userContent != null) {
+            Content content = userContent.getContent();
+            throw new RuntimeException("You have a content in progress named \"%s\". Please complete the content first. id=%d".formatted(content.getTitle(), content.getId()));
         }
         return contentRepository.findByLevelAndContentTypeAndDeleted(level, ContentType.GRAMMAR, false);
     }
+
+    public Optional<Content> getContent(Long id) {
+        return contentRepository.findById(id);
+    }
+
+    public Optional<Content> getContent(String storyId, Long userId) {
+        Optional<Content> content = contentRepository.findById(Long.valueOf(storyId));
+        return Optional.empty();
+    }
+
+
 
     public List<AuthUser> getAllUsers() {
         return userRepository.findByDeleted(false);
@@ -126,6 +159,30 @@ public class UserService {
         userRepository.save(byId);
     }
 
+
+    public Content getStoryById(Long id) {
+        return contentRepository.findByIdAndContentType(id, ContentType.STORY);
+    }
+
+    public List<Comment> getComments(Long id) {
+        return Objects.requireNonNullElse(commentRepository.findAllByContentIdAndDeleted(id, false), new ArrayList<>());
+    }
+
+    public void addComment(Comment comment) {
+        commentRepository.saveComment(comment.getComment(), String.valueOf(comment.getCommentType()), comment.getUserId().getId(), comment.getContentId(), comment.getParentId());
+    }
+
+    public Optional<Comment> getCommentById(Long commentId) {
+        return commentRepository.findById(commentId);
+    }
+
+    public void deleteCommentById(Long id) {
+        commentRepository.setAsDelete(id);
+    }
+
+    public void updateComment(Comment comment1) {
+        commentRepository.updateComment(comment1.getComment(), comment1.getId());
+    }
     // Abdullo's code below that
 
 
@@ -226,5 +283,105 @@ public class UserService {
 
     public AuthUser getUser(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public void updateRole(Long id, String role) {
+        AuthUser user = userRepository.findById(id);
+        user.getAuthRoles().clear();
+        user.getAuthRoles().add(userRepository.findRoleByName(role));
+        userRepository.save(user);
+    }
+
+    /*public void saveGithubUser(Map<String, Object> attributes) {
+        String id = attributes.get("id").toString();
+        BigInteger username = Util.getInstance().convertToBigInteger(id);
+        System.out.println(username);
+//        String email = (String) attributes.get("email");
+//        String password = "the.Strongest.Password@Ever9";
+//        String firstName = (String) attributes.get("name");
+//        String lastName = null;
+//        String[] strings = firstName.split(" ");
+
+        for (Map.Entry<String, Object> stringObjectEntry : attributes.entrySet()) {
+            System.out.println(stringObjectEntry.getKey() + " : " + stringObjectEntry.getValue());
+        }
+
+//        if (strings.length == 2) {
+//            firstName = strings[0];
+//            lastName = strings[1];
+//        } else firstName = strings[0];
+
+//        AuthUser user = AuthUser.builder()
+//                .username(username)
+//                .password(passwordEncoder.encode(password))
+//                .email(email)
+//                .firstName(firstName)
+//                .lastName(lastName)
+//                .status(Status.ACTIVE)
+//                .build();
+//        userRepository.save(user);
+    }*/
+
+
+    public void saveUserContent(UserContent userContent) {
+        userContentRepository.save(userContent);
+    }
+
+    public List<Vocabulary> mapRequestToVocabularyList(HttpServletRequest request, Content content, AuthUser authUser) {
+        List<Vocabulary> vocabularyList = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++) {
+            vocabularyList.add(mapVocabulary(request, i, authUser, content));
+        }
+        String[] uzbekWords = request.getParameterValues("uzbekWord");
+        String[] englishWords = request.getParameterValues("englishWord");
+        String[] definitions = request.getParameterValues("definition");
+        if (uzbekWords == null || englishWords == null ||
+                uzbekWords.length == 0 ||
+                englishWords.length == 0 ||
+                uzbekWords.length != englishWords.length
+        ) {
+            throw new RuntimeException("Please fill all fields");
+        }
+        for (int i = 0; i < uzbekWords.length; i++) {
+            Vocabulary vocabulary = Vocabulary.builder()
+                    .story(content)
+                    .authUser(authUser)
+                    .word(englishWords[i])
+                    .translation(uzbekWords[i])
+                    .definition(Objects.requireNonNullElse(definitions[i], ""))
+                    .build();
+            vocabularyList.add(vocabulary);
+        }
+        return vocabularyList;
+    }
+
+    private Vocabulary mapVocabulary(HttpServletRequest request, int i, AuthUser authUser, Content content) {
+        return Vocabulary.builder()
+                .word(request.getParameter("word" + i))
+                .translation(request.getParameter("translation" + i))
+                .definition(request.getParameter("definition" + i))
+                .story(content)
+                .authUser(authUser)
+                .build();
+    }
+
+    public void addVocabularyList(List<Vocabulary> vocabularies) {
+        vocabularyRepository.saveAll(vocabularies);
+    }
+
+    public CompletionStage<Object> getAllQuestions(Long id) {
+        return CompletableFuture.supplyAsync(() -> questionRepository.findAllByContentId(id));
+    }
+
+    public CompletionStage<Object> getAllOptions(Object questions) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<Questions> questionsList = (List<Questions>) questions;
+            List<Options> options = new ArrayList<>();
+            for (Questions question : questionsList) {
+                options.addAll(optionRepository.findAllByQuestionId(question.getId()));
+            }
+            return options;
+        });
     }
 }

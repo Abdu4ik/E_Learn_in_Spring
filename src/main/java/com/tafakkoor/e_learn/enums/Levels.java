@@ -9,5 +9,4 @@ public enum Levels {
     ADVANCED,
     PROFICIENCY,
     DEFAULT
-
 }
