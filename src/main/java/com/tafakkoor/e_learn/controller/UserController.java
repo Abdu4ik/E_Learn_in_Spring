@@ -176,8 +176,14 @@ public class UserController {
                 modelAndView.setViewName("user/levelNotFound");
                 return modelAndView;
             }
+            UserContent statusContent = null;
 
-            UserContent statusContent = userService.checkUserStatus(userSession.getId());
+            try {
+
+                 statusContent = userService.checkUserStatus(userSession.getId());
+            }catch (Exception var8) {
+                var8.printStackTrace();
+            }
             if (statusContent != null && !Objects.equals(statusContent.getContent().getId(), id)) {
                 String var10001 = statusContent.getContent().getContentType().equals(ContentType.GRAMMAR) ? "grammars" : "stories";
                 modelAndView.setViewName("redirect:/practise/" + var10001 + "/" + statusContent.getContent().getId());

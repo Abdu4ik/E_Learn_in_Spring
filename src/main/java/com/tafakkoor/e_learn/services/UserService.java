@@ -42,6 +42,8 @@ public class UserService {
     private final QuestionsRepository questionRepository;
     private final OptionRepository optionRepository;
 
+    private final Gson gson = Util.getInstance().getGson();
+
     public UserService(AuthUserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        TokenRepository tokenRepository,
