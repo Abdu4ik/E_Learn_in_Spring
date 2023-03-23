@@ -1,9 +1,7 @@
 package com.tafakkoor.e_learn.services;
 
-import com.tafakkoor.e_learn.domain.AuthUser;
-import com.tafakkoor.e_learn.domain.Content;
-import com.tafakkoor.e_learn.domain.Image;
-import com.tafakkoor.e_learn.domain.UserContent;
+import com.google.gson.Gson;
+import com.tafakkoor.e_learn.domain.*;
 import com.tafakkoor.e_learn.dto.UserRegisterDTO;
 import com.tafakkoor.e_learn.enums.ContentType;
 import com.tafakkoor.e_learn.enums.Levels;
@@ -12,6 +10,9 @@ import com.tafakkoor.e_learn.enums.Status;
 import com.tafakkoor.e_learn.repository.*;
 import com.tafakkoor.e_learn.utils.Util;
 import com.tafakkoor.e_learn.utils.mail.EmailService;
+import com.tafakkoor.e_learn.vos.FacebookVO;
+import com.tafakkoor.e_learn.vos.GoogleVO;
+import com.tafakkoor.e_learn.vos.LinkedInVO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,6 +41,7 @@ public class UserService {
     private final VocabularyRepository vocabularyRepository;
     private final QuestionsRepository questionRepository;
     private final OptionRepository optionRepository;
+    private final Gson gson=Util.getInstance().getGson();
 
     public UserService(AuthUserRepository userRepository,
                        PasswordEncoder passwordEncoder,
