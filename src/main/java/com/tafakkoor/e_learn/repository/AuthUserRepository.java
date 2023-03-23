@@ -1,5 +1,6 @@
 package com.tafakkoor.e_learn.repository;
 
+import com.tafakkoor.e_learn.domain.AuthRole;
 import com.tafakkoor.e_learn.domain.AuthUser;
 import com.tafakkoor.e_learn.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
