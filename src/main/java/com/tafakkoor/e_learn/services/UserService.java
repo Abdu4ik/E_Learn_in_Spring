@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 @Service
 public class UserService {
@@ -36,7 +37,8 @@ public class UserService {
     private final ContentRepository contentRepository;
     private final CommentRepository commentRepository;
     private final VocabularyRepository vocabularyRepository;
-
+    private final QuestionsRepository questionRepository ;
+    private final OptionRepository optionRepository;
     public UserService(AuthUserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        TokenRepository tokenRepository,
@@ -44,7 +46,8 @@ public class UserService {
                        UserContentRepository userContentRepository,
                        ContentRepository contentRepository,
                        CommentRepository commentRepository,
-                       VocabularyRepository vocabularyRepository, ImageService imageService) {
+                       VocabularyRepository vocabularyRepository, ImageService imageService, QuestionsRepository questionRepository, OptionRepository optionRepository) {
+        this.questionRepository = questionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
@@ -53,6 +56,7 @@ public class UserService {
         this.contentRepository = contentRepository;
         this.commentRepository = commentRepository;
         this.vocabularyRepository = vocabularyRepository;
+        this.optionRepository = optionRepository;
     }
 
     public List<Levels> getLevels(@NonNull Levels level) {
@@ -326,4 +330,20 @@ public class UserService {
     public void addVocabularyList(List<Vocabulary> vocabularies) {
         vocabularyRepository.saveAll(vocabularies);
     }
+
+    public CompletionStage<Object> getAllQuestions(Long id) {
+        return CompletableFuture.supplyAsync(() -> questionRepository.findAllByContentId(id));
+    }
+
+    public CompletionStage<Object> getAllOptions(Object questions) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<Questions> questionsList = (List<Questions>) questions;
+            List<Options> options = new ArrayList<>();
+            for (Questions question : questionsList) {
+                options.addAll(optionRepository.findAllByQuestionId(question.getId()));
+            }
+            return options;
+        });
+    }
+
 }
