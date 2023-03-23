@@ -17,8 +17,8 @@ public class TokenService {
         this.tokenRepository = tokenRepository;
     }
 
-    public void save(Token token){
-       tokenRepository.save(token);
+    public void save(Token token) {
+        tokenRepository.save(token);
     }
 
     public String generateToken() {

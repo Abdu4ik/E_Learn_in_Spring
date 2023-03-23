@@ -10,7 +10,7 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class Options extends Auditable{
+public class Options extends Auditable {
     @Column(nullable = false)
     private String value;
     @Column(nullable = false, columnDefinition = "boolean default false")

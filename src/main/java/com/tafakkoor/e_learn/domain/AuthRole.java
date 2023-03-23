@@ -12,7 +12,7 @@ import java.util.Collection;
 @NoArgsConstructor
 @ToString
 @Builder
-public class AuthRole extends Auditable{
+public class AuthRole extends Auditable {
     @Column(nullable = false)
     private String name;
     @Column(nullable = false, unique = true)

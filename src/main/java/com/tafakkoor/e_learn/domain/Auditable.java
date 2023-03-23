@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @MappedSuperclass
@@ -29,6 +30,6 @@ public abstract class Auditable {
     @JoinColumn(name = "deleted_by")
     @ManyToOne
     private AuthUser deletedBy;
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Column(nullable = false)
     private boolean deleted;
 }

@@ -15,7 +15,19 @@ public class ImageService {
     public Image saveImage(Image image) {
         return imageRepository.save(image);
     }
-    public Image findById(Long id){
+
+    public Image findById(Long id) {
         return imageRepository.findById(id).orElse(null);
+    }
+
+    public Image buildAndSaveImage(String url, String name) {
+        Image image = Image.builder()
+                .mimeType("image/jpg")
+                .generatedFileName(name)
+                .originalFileName(name)
+                .filePath(url)
+                .build();
+
+        return imageRepository.save(image);
     }
 }

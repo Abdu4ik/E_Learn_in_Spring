@@ -1,24 +1,15 @@
 package com.tafakkoor.e_learn.utils;
 
+import com.google.gson.Gson;
 import com.tafakkoor.e_learn.domain.AuthUser;
 import com.tafakkoor.e_learn.domain.Token;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 public class Util {
     private static final ThreadLocal<Util> UTIL_THREAD_LOCAL = ThreadLocal.withInitial(Util::new);
+    private static final ThreadLocal<Gson> GSON_THREAD_LOCAL = ThreadLocal.withInitial(Gson::new);
 
     public Token buildToken(String token, AuthUser authUser) {
         return Token.builder()
@@ -28,9 +19,9 @@ public class Util {
                 .build();
     }
 
-public String generateBody(String username, String token){
-    String link = Container.BASE_URL + "auth/activate?token=" + token;
-    return """
+    public String generateBody(String username, String token) {
+        String link = Container.BASE_URL + "auth/activate?token=" + token;
+        return """
                 Subject: Activate Your Account
                                 
                 Dear %s,
@@ -44,11 +35,10 @@ public String generateBody(String username, String token){
                 Best regards,
                 E-Learn LTD.
                 """.formatted(username, link);
-}
+    }
 
 
-
-    public String generateBodyForInactiveUsers(String username){
+    public String generateBodyForInactiveUsers(String username) {
         return """
                 Subject: Login to Your Account
                                 
@@ -62,11 +52,11 @@ public String generateBody(String username, String token){
                                 
                 Best regards,
                 E-Learn LTD.
-                """.formatted(username,Container.BASE_URL); // TODO: 13/03/23 write message to users that 3 days inactive
+                """.formatted(username, Container.BASE_URL); // TODO: 13/03/23 write message to users that 3 days inactive
     }
 
 
-    public String generateBodyForBirthDay(String username){
+    public String generateBodyForBirthDay(String username) {
         return """
                 Subject: Happy Birthday
                                 
@@ -80,7 +70,7 @@ public String generateBody(String username, String token){
                                 
                 Best regards,
                 E-Learn LTD.
-                """.formatted(username,Container.BASE_URL); // TODO: 13/03/23 write message to celebrate birthday
+                """.formatted(username, Container.BASE_URL); // TODO: 13/03/23 write message to celebrate birthday
     }
 
     public BigInteger convertToBigInteger(String number) {
@@ -98,6 +88,10 @@ public String generateBody(String username, String token){
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid input string. Must be in scientific notation.");
         }
+    }
+
+    public Gson getGson() {
+        return GSON_THREAD_LOCAL.get();
     }
 
     public static Util getInstance() {

@@ -1,39 +1,30 @@
 package com.tafakkoor.e_learn.controller;
 
-import com.tafakkoor.e_learn.exceptions.CustomRuntimeException;
 import com.tafakkoor.e_learn.config.security.UserSession;
+import com.tafakkoor.e_learn.services.UserService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.security.Principal;
-import java.util.Random;
 
 @Controller
 public class HomeController {
 
     private final UserSession userSession;
+    private final UserService userService;
 
-    public HomeController(UserSession userSession) {
+    public HomeController(UserSession userSession, UserService userService) {
         this.userSession = userSession;
+        this.userService = userService;
     }
 
+    // allow only authenticated users
     @GetMapping("/home")
-    public String hasAdminRole(Model model, Principal principal) {
-        return "home";
-    }
-
-    @GetMapping("/home2")
-    /*@RolesAllowed("ADMIN")*/
-    public String homePage2() {
-        return "main2";
+    public ModelAndView hasAdminRole(Principal principal) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("user", userService.getUser(principal.getName()));
+        modelAndView.setViewName("home/index");
+        return modelAndView;
     }
 }
