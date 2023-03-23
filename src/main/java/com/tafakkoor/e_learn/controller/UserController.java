@@ -199,6 +199,7 @@ public class UserController {
         } else {
             modelAndView.addObject("levelNotFound", "You have not taken assessment test yet");
             modelAndView.setViewName("user/levelNotFound");
+
         }
         return modelAndView;
     }
