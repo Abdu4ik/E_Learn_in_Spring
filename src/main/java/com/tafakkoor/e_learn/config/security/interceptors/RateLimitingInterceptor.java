@@ -9,7 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 public class RateLimitingInterceptor implements HandlerInterceptor {
 
-    private static final RateLimiterService rateLimiter = new RateLimiterService(10000.0);
+    private static final RateLimiterService rateLimiter = new RateLimiterService(100.0);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

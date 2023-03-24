@@ -22,6 +22,11 @@
     <link rel="stylesheet" href="/css/owl.css">
     <link rel="stylesheet" href="/css/animate.css">
     <link rel="stylesheet" href="/css/swiper-bundle.min.css"/>
+      <style>
+          .logout:hover{
+                color: red;
+          }
+      </style>
 <!--
 
 TemplateMo 579 Cyborg Gaming
@@ -59,10 +64,12 @@ https://templatemo.com/tm-579-cyborg-gaming
                     <!-- ***** Logo End ***** -->
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav" th:object="${user}">
-                        <li><a href="index.html" class="active">Home</a></li>
-                        <li><a href="browse.html">Browse</a></li>
-                        <li><a href="details.html">Details</a></li>
-                        <li><a href="streams.html">Streams</a></li>
+                        <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}"><a href="/admin">Admin Page</a></li>
+                        <li><a href="/home" class="active">Home</a></li>
+                        <li><a href="/practise">Practise</a></li>
+                        <li><a href="/practise/story">Reading</a></li>
+                        <li><a href="/practise/grammar">Grammar</a></li>
+                        <li><a href="/auth/logout" class="logout">Log out</a></li>
                         <li><a th:href="@{user/profile}"><span th:text="*{firstName}"></span><img th:src="@{${user.image != null ? user.image.getFilePath() : '/img/default.png'}}" alt=""></a></li>
                     </ul>
                     <a class='menu-trigger'>
@@ -86,10 +93,10 @@ https://templatemo.com/tm-579-cyborg-gaming
             <div class="row">
               <div class="col-lg-7">
                 <div class="header-text">
-                  <h6>Welcome To Cyborg</h6>
-                  <h4><em>Browse</em> Our Popular Games Here</h4>
+                  <h6>Welcome To E-Learn</h6>
+                  <h4><em>Browse</em> Our Popular Stories to improve your vocabulary</h4>
                   <div class="main-button">
-                    <a href="browse.html">Browse Now</a>
+                    <a href="/practise/story">Browse Now</a>
                   </div>
                 </div>
               </div>
@@ -104,86 +111,100 @@ https://templatemo.com/tm-579-cyborg-gaming
                 <div class="heading-section">
                   <h4>Articles you might be interested in</h4>
                 </div>
+
+
                 <div class="row">
                   <div class="col-lg-3 col-sm-6">
                     <div class="item">
-                      <img th:src="@{~/img/popular-01.jpg}" alt="">
-                      <h4>Fortnite<br><span>Sandbox</span></h4>
+<!--                        <img th:src="@{~/external/img/logo.png}" alt="My Image"> to show image from external folder-->
+                                              <img th:src="@{~/img/popular-01.jpg}" alt="">
+                      <h4>Learn English in one day<br><span>Teacher Tafakkoor</span></h4>
                       <ul>
                         <li><i class="fa fa-star"></i> 4.8</li>
                       </ul>
                     </div>
                   </div>
+
+
                   <div class="col-lg-3 col-sm-6">
                     <div class="item">
                       <img th:src="@{~/img/popular-02.jpg}" alt="">
-                      <h4>PubG<br><span>Battle S</span></h4>
+                      <h4>Is Java a Coffee?<br><span>Teacher Javakhir</span></h4>
                       <ul>
                         <li><i class="fa fa-star"></i> 4.8</li>
                       </ul>
                     </div>
                   </div>
+
+
                   <div class="col-lg-3 col-sm-6">
                     <div class="item">
                       <img th:src="@{~/img/popular-03.jpg}" alt="">
-                      <h4>Dota2<br><span>Steam-X</span></h4>
+                      <h4>Just Learn it<br><span>Somebody</span></h4>
                       <ul>
                         <li><i class="fa fa-star"></i> 4.8</li>
                       </ul>
                     </div>
                   </div>
+
+
                   <div class="col-lg-3 col-sm-6">
                     <div class="item">
                       <img th:src="@{~/img/popular-04.jpg}" alt="">
-                      <h4>CS-GO<br><span>Legendary</span></h4>
+                      <h4>Why Uzb=Uzb<br><span>Teacher Mantiq</span></h4>
                       <ul>
                         <li><i class="fa fa-star"></i> 4.8</li>
                       </ul>
                     </div>
                   </div>
-                  <div class="col-lg-6">
-                    <div class="item">
-                      <div class="row">
-                        <div class="col-lg-6 col-sm-6">
-                          <div class="item inner-item">
-                            <img th:src="@{~/img/popular-05.jpg}" loading="lazy" alt="">
-                            <h4>Mini Craft<br><span>Legendary</span></h4>
-                            <ul>
-                              <li><i class="fa fa-star"></i> 4.8</li>
-                            </ul>
-                          </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="item">
+                                <img th:src="@{~/img/popular-01.jpg}" alt="">
+                                <h4>Is more expensive<br>always better?<br><span>Teacher Qimmatiy</span></h4>
+                                <ul>
+                                    <li><i class="fa fa-star"></i> 5.0</li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="col-lg-6 col-sm-6">
-                          <div class="item">
-                            <img th:src="@{~/img/popular-06.jpg}" alt="">
-                            <h4>Eagles Fly<br><span>Matrix Games</span></h4>
-                            <ul>
-                              <li><i class="fa fa-star"></i> 4.8</li>
-                            </ul>
-                          </div>
+
+
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="item">
+                                <img th:src="@{~/img/popular-02.jpg}" alt="">
+                                <h4>Speak like a native<br>in one week<br><span>Teacher Utkiriy</span></h4>
+                                <ul>
+                                    <li><i class="fa fa-star"></i> 4.8</li>
+                                </ul>
+                            </div>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-lg-3 col-sm-6">
-                    <div class="item">
-                      <img src="/img/popular-07.jpg" alt="">
-                      <h4>Warface<br><span>Max 3D</span></h4>
-                      <ul>
-                        <li><i class="fa fa-star"></i> 4.8</li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div class="col-lg-3 col-sm-6">
-                    <div class="item">
-                      <img th:src="@{~/img/popular-08.jpg}" alt="">
-                      <h4>Warcraft<br><span>Legend</span></h4>
-                      <ul>
-                        <li><i class="fa fa-star"></i> 4.8</li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div class="col-lg-12">
+
+
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="item">
+                                <img th:src="@{~/img/popular-03.jpg}" alt="">
+                                <h4>How much is<br>is too much<br><span>Teacher Balance</span></h4>
+                                <ul>
+                                    <li><i class="fa fa-star"></i> 4.8</li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="item">
+                                <img th:src="@{~/img/popular-04.jpg}" alt="">
+                                <h4>What is the difference<br>between REST and rest<br><span>Teacher Yakshanba</span></h4>
+                                <ul>
+                                    <li><i class="fa fa-star"></i> 4.8</li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-12">
                     <div class="main-button">
                       <a href="browse.html">Discover Popular</a>
                     </div>
@@ -197,14 +218,12 @@ https://templatemo.com/tm-579-cyborg-gaming
       </div>
     </div>
   </div>
-  
+
   <footer>
     <div class="container">
       <div class="row">
         <div class="col-lg-12">
-          <p>Copyright © 2036 <a href="#">Cyborg Gaming</a> Company. All rights reserved. 
-          
-          <br>Design: <a href="https://templatemo.com" target="_blank" title="free CSS templates">TemplateMo</a></p>
+          <p>Copyright © 2036 <a href="#">E-Learn</a> Company. All rights reserved.</p>
         </div>
       </div>
     </div>

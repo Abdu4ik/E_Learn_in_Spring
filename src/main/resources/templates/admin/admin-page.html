@@ -29,7 +29,7 @@
         <tr th:each="user :${users}" th:if="${#authentication.name}!=${user.getUsername()}">
             <td th:text="${#ids.seq(0)}"></td>
             <td th:text="${user.getUsername()}"></td>
-            <td th:text="${user.getFirstName()}">Name</td>
+            <td th:text="*{user.firstName.concat(' ').concat(user.lastName)}">Name</td>
             <td th:text="${user.getEmail()}"></td>
             <td th:text="${user.getBirthDate()}"></td>
             <td th:text="${user.getLevel()}"></td>

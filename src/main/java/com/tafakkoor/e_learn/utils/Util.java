@@ -22,56 +22,85 @@ public class Util {
 
     public String generateBody(String username, String token) {
         String link = Container.BASE_URL + "auth/activate?token=" + token;
-        return """
-                Subject: Activate Your Account
+        return """                      
+                <h1>Dear %s,</h1>          
+                <p>                                
+                Thank you for registering on our website. To activate your account, please click on Activate:
+                The link will be valid for 10 minutes. After that, you will need to register again.
+                </p>
+                <br>
                                 
-                Dear %s,
-                                
-                Thank you for registering on our website. To activate your account, please click on the following link:
-                                
+                <a href="%s">Activate</a>
+                
+                <br>
+                <br>
+                <p>
+                If the link does not work, please copy and paste the following link in your browser:
                 %s
-                                
+                </p>
+                <br>
+                <p>             
                 If you have any questions or need assistance, please contact us at [SUPPORT_EMAIL OR TELEGRAM_BOT].
-                                
-                Best regards,
-                E-Learn LTD.
-                """.formatted(username, link);
+                </p>
+                
+                <br>
+                <br>
+                <br>
+                <strong>Best regards,</strong>
+                <br>
+                <strong>E-Learn LTD.</strong>
+                """.formatted(username, link, link);
     }
 
 
     public String generateBodyForInactiveUsers(String username) {
-        return """
-                Subject: Login to Your Account
-                                
-                Dear %s,
-                                
-                // message
-                                
-                %s
-                                
+        return """                                
+                <h1>Dear %s,</h1>
+                
+                <p>                
+                I has been 3 days since you last logged in to your account. We hope you are doing well and enjoying our services.
+                To really improve your learning experience, we recommend you to login to your account and continue learning process.
+                As a reminder, you can login to your account by clicking on the following link:
+                </p>
+                <br>
+                
+                <a href="http://localhost:8080/auth/login">Login</a>
+                
+                <br>
+                <br>
+                <p>                                                
                 If you have any questions or need assistance, please contact us at [SUPPORT_EMAIL OR TELEGRAM_BOT].
-                                
-                Best regards,
-                E-Learn LTD.
-                """.formatted(username, Container.BASE_URL); // TODO: 13/03/23 write message to users that 3 days inactive
+                </p>
+                   
+                <br> 
+                <br>
+                <br>
+                <strong>Best regards,</strong>
+                <br>
+                <strong>E-Learn LTD.</strong>
+                """.formatted(username);
     }
 
 
     public String generateBodyForBirthDay(String username) {
-        return """
-                Subject: Happy Birthday
-                                
-                Dear %s,
-                                
-                // message
-                                
-                %s
-                                
+        return """    
+                <h1>Dear %s,</h1>                            
+                <p>                                
+                We wish you a very happy birthday. We hope you have a wonderful day and a great year ahead.
+                We are very grateful to have you as a member of our community. We hope you will continue to enjoy our services.
+                </p>
+                <br>
+                <p>            
                 If you have any questions or need assistance, please contact us at [SUPPORT_EMAIL OR TELEGRAM_BOT].
-                                
-                Best regards,
-                E-Learn LTD.
-                """.formatted(username, Container.BASE_URL); // TODO: 13/03/23 write message to celebrate birthday
+                </p>
+                
+                <br>
+                <br>
+                <br>
+                <strong>Best regards,</strong>
+                <br>
+                <strong>E-Learn LTD.</strong>
+                """.formatted(username);
     }
 
     public BigInteger convertToBigInteger(String number) {

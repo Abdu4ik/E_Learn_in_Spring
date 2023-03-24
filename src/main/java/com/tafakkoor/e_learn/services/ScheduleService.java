@@ -26,40 +26,37 @@ public class ScheduleService {
         this.tokenRepository = tokenRepository;
     }
 
-    // send email to user that have not logged in for 3 days
-    @Scheduled( fixedRate = 1000 * 60 * 60 * 24 ) // 1 day
+    @Scheduled( fixedRate = 1000 * 60 * 60 * 24, initialDelay = 10000) // 1 day
     public void sendEmailToInactiveUsers() { // done
         List<AuthUser> users = authUserRepository.findByLastLoginBefore(LocalDateTime.now().plusDays(3));
         EmailService emailService = EmailService.getInstance();
         for ( AuthUser user : users ) {
             CompletableFuture.runAsync(() -> emailService.sendEmail(user.getEmail(),
-                    Util.getInstance().generateBodyForInactiveUsers(user.getUsername())
+                    Util.getInstance().generateBodyForInactiveUsers(user.getFirstName() + " " + user.getLastName())
                     , "Login to Your Account"));
         }
     }
 
 
-    @Scheduled( fixedRate = ( 1000 * 60 * 10 ) ) //  10 minutes
+    @Scheduled( fixedRate = ( 1000 * 60 * 10 ), initialDelay = 10000 ) //  10 minutes
     public void deleteExpiredTokens() { // done
         tokenRepository.deleteByCreatedAtBefore();
     }
 
-    @Scheduled( fixedRate = 1000 * 60 * 10 ) // 10 MINUTE
+    @Scheduled( fixedRate = 1000 * 60 * 10, initialDelay = 10000 ) // 10 MINUTE
     public void deleteInactiveUsers() {   // done
         authUserRepository.deleteByStatusInActive();
     }
 
-    // schedule for a task to be executed every day at 12:00 am
-    @Scheduled( cron = "0 0 12 * * *" )
+    @Scheduled( cron = "0 0 12 * * *")
     public void sendBirthdayEmails() { // done
         EmailService emailService = EmailService.getInstance();
 
         List<AuthUser> users = authUserRepository.findAllByBirtDate(LocalDate.now());
         for (AuthUser user : users) {
             CompletableFuture.runAsync(() -> emailService.sendEmail(user.getEmail(),
-                    Util.getInstance().generateBodyForBirthDay(user.getUsername())
+                    Util.getInstance().generateBodyForBirthDay(user.getFirstName() + " " + user.getLastName())
                     , "Happy Birthday"));
         }
-
     }
 }

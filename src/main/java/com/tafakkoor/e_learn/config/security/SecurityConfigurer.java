@@ -2,6 +2,7 @@ package com.tafakkoor.e_learn.config.security;
 
 import com.tafakkoor.e_learn.config.a.LinkedInAuthenticationSuccessHandler;
 import com.tafakkoor.e_learn.config.a.LinkedInOAuth2UserService;
+import com.tafakkoor.e_learn.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -10,13 +11,18 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
@@ -37,6 +43,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.time.LocalDateTime;
@@ -60,13 +68,10 @@ public class SecurityConfigurer implements WebSecurityConfigurer<WebSecurity> {
             "/img/**",
             "/webfonts/**",
             "/jquery/**",
-            "/home",
-            "/home2",
             "/error",
             "/auth/login",
             "oauth/linkedin/**",
             "/",
-//            "/auth/oauth_login",
             "/upload",
             "/linkedin",
             "/linkedin/callback",
@@ -79,7 +84,6 @@ public class SecurityConfigurer implements WebSecurityConfigurer<WebSecurity> {
             "/oauth2/**",
             "google-login",
             "/loginSuccess",
-//            "/loginSuccess",
             "/auth/forget-password",
             "/auth/reset-password"
 
@@ -95,14 +99,16 @@ public class SecurityConfigurer implements WebSecurityConfigurer<WebSecurity> {
             = "spring.security.oauth2.client.registration.";
 
     private final Environment env;
+    private final UserService userService;
 
     private final AuthUserUserDetailsService authUserUserDetailsService;
     private final AuthenticationFailureHandler authenticationFailureHandler;
 
-    public SecurityConfigurer(/*ClientRegistrationRepository clientRegistrationRepository,*/ Environment env, AuthUserUserDetailsService authUserUserDetailsService,
+    public SecurityConfigurer(/*ClientRegistrationRepository clientRegistrationRepository,*/ Environment env, UserService userService, AuthUserUserDetailsService authUserUserDetailsService,
                                                                                              AuthenticationFailureHandler authenticationFailureHandler) {
 //        this.clientRegistrationRepository = clientRegistrationRepository;
         this.env = env;
+        this.userService = userService;
         this.authUserUserDetailsService = authUserUserDetailsService;
         this.authenticationFailureHandler = authenticationFailureHandler;
     }
@@ -198,6 +204,28 @@ public class SecurityConfigurer implements WebSecurityConfigurer<WebSecurity> {
         return new LinkedInAuthenticationSuccessHandler();
     }
 
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public ConcurrentSessionControlAuthenticationStrategy sessionAuthenticationStrategy() {
+        ConcurrentSessionControlAuthenticationStrategy strategy = new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry());
+        strategy.setMaximumSessions(1);
+        strategy.setExceptionIfMaximumExceeded(false);
+        return strategy;
+    }
+
+//    @Bean   todo this is not working
+//    public Customizer<SessionManagementConfigurer<HttpSecurity>.ConcurrencyControlConfigurer> concurrencyControlConfigurer() {
+//        SessionManagementConfigurer sessionManagementConfigurer = new SessionManagementConfigurer();
+//        SessionManagementConfigurer.ConcurrencyControlConfigurer concurrencyControlConfigurer = sessionManagementConfigurer.concurrencyControl();
+//        concurrencyControlConfigurer.sessionRegistry(sessionRegistry());        concurrencyControlConfigurer.maximumSessions(1);
+//        concurrencyControlConfigurer.expiredUrl("/auth/login?expired=true");
+//        return concurrencyControlConfigurer;
+//    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -239,6 +267,23 @@ public class SecurityConfigurer implements WebSecurityConfigurer<WebSecurity> {
                                 .defaultSuccessUrl("/home", false)
                                 .failureHandler(authenticationFailureHandler)
                 )
+
+
+                .sessionManagement()
+                .maximumSessions(1)
+                .sessionRegistry(sessionRegistry())
+                .and()
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .invalidSessionUrl("/login?expired=true")
+                .sessionFixation().newSession()
+                .sessionAuthenticationErrorUrl("/login?error=true")
+                .sessionAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler("/login?error=true"))
+                .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
+//                .sessionConcurrency(concurrencyControlConfigurer())
+                .maximumSessions(1)
+                .expiredUrl("/login?expired=true")
+                .and()
+                .and()
 
 
 //                .formLogin(httpSecurityFormLoginConfigurer ->

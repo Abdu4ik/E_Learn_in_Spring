@@ -104,5 +104,8 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .addResourceLocations("classpath:static/jquery/");
         registry.addResourceHandler("/webfonts/*")
                 .addResourceLocations("classpath:static/webfonts/");
+
+        registry.addResourceHandler("/external/**")
+                .addResourceLocations("file:/home/tafakkoor/external/");
     }
 }

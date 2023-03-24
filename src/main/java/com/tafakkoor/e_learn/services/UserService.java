@@ -2,6 +2,7 @@ package com.tafakkoor.e_learn.services;
 
 import com.google.gson.Gson;
 import com.tafakkoor.e_learn.domain.*;
+import com.tafakkoor.e_learn.dto.UpdateUserDTO;
 import com.tafakkoor.e_learn.dto.UserRegisterDTO;
 import com.tafakkoor.e_learn.enums.ContentType;
 import com.tafakkoor.e_learn.enums.Levels;
@@ -14,18 +15,16 @@ import com.tafakkoor.e_learn.vos.FacebookVO;
 import com.tafakkoor.e_learn.vos.GoogleVO;
 import com.tafakkoor.e_learn.vos.LinkedInVO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -41,6 +40,7 @@ public class UserService {
     private final VocabularyRepository vocabularyRepository;
     private final QuestionsRepository questionRepository;
     private final OptionRepository optionRepository;
+    private final AuthRoleRepository authRoleRepository;
 
     private final Gson gson = Util.getInstance().getGson();
 
@@ -51,7 +51,7 @@ public class UserService {
                        UserContentRepository userContentRepository,
                        ContentRepository contentRepository,
                        CommentRepository commentRepository,
-                       VocabularyRepository vocabularyRepository, ImageService imageService, QuestionsRepository questionRepository, OptionRepository optionRepository) {
+                       VocabularyRepository vocabularyRepository, ImageService imageService, QuestionsRepository questionRepository, OptionRepository optionRepository, AuthRoleRepository authRoleRepository) {
         this.questionRepository = questionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -62,6 +62,7 @@ public class UserService {
         this.commentRepository = commentRepository;
         this.vocabularyRepository = vocabularyRepository;
         this.optionRepository = optionRepository;
+        this.authRoleRepository = authRoleRepository;
     }
 
     public List<Levels> getLevels(@NonNull Levels level) {
@@ -88,6 +89,8 @@ public class UserService {
     public void saveUserAndSendEmail(UserRegisterDTO dto) {
         AuthUser user = AuthUser.builder()
                 .username(dto.getUsername().toLowerCase())
+                .firstName(dto.getFirstname())
+                .lastName(dto.getLastname())
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .email(dto.getEmail().toLowerCase())
                 .build();
@@ -101,7 +104,7 @@ public class UserService {
         String email = authUser.getEmail();
         String body = util.generateBody(authUser.getUsername(), token);
         tokenService.save(util.buildToken(token, authUser));
-        CompletableFuture.runAsync(() -> EmailService.getInstance().sendEmail(email, body, "Activate Email"));
+        CompletableFuture.runAsync(() -> EmailService.getInstance().sendEmail(email, body, "Activation Email"));
     }
 
 
@@ -291,7 +294,8 @@ public class UserService {
     public void updateRole(Long id, String role) {
         AuthUser user = userRepository.findById(id);
         user.getAuthRoles().clear();
-        user.getAuthRoles().add(userRepository.findRoleByName(role));
+        AuthRole roleByName = authRoleRepository.findRoleByName(role);
+        user.getAuthRoles().add(roleByName);
         userRepository.save(user);
     }
 
@@ -415,5 +419,43 @@ public class UserService {
 
     public void update(AuthUser user) {
         userRepository.save(user);
+    }
+
+    public List<String> getBlockedUsers() {
+        List<AuthUser> authUserList = userRepository.findAllByStatus(Status.BLOCKED);
+        List<String> blockedUsers = new ArrayList<>();
+        for (AuthUser authUser : authUserList) {
+            blockedUsers.add(authUser.getUsername());
+        }
+        return blockedUsers;
+    }
+
+    public boolean isUserBlocked(String username){
+        return userRepository.findByUsername(username).getStatus().equals(Status.BLOCKED);
+    }
+
+    public void updateUser(UpdateUserDTO dto) {
+        AuthUser user = userRepository.findById(Long.valueOf(dto.id()));
+        user.setFirstName(dto.firstName());
+        user.setLastName(dto.lastName());
+        user.setEmail(dto.email());
+        user.setUsername(dto.username());
+        user.setBirthDate(dto.birthDate());
+        userRepository.save(user);
+    }
+
+    public String getSessionId(Long userId, HttpServletRequest request) {
+        // retrieve the session ID associated with the user's session
+        for (Object principal : SecurityContextHolder.getContext().getAuthentication().getAuthorities()) {
+            if (principal instanceof AuthUser user) {
+                if (user.getId().equals(userId)) {
+                    HttpSession session = request.getSession(false);
+                    if (session != null && user.getUsername().equals(session.getAttribute("username"))) {
+                        return session.getId();
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
