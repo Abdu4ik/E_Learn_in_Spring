@@ -176,14 +176,8 @@ public class UserController {
                 modelAndView.setViewName("user/levelNotFound");
                 return modelAndView;
             }
-            UserContent statusContent = null;
+            UserContent statusContent  = userService.checkUserStatus(userSession.getId());
 
-            try {
-
-                 statusContent = userService.checkUserStatus(userSession.getId());
-            }catch (Exception var8) {
-                var8.printStackTrace();
-            }
             if (statusContent != null && !Objects.equals(statusContent.getContent().getId(), id)) {
                 String var10001 = statusContent.getContent().getContentType().equals(ContentType.GRAMMAR) ? "grammars" : "stories";
                 modelAndView.setViewName("redirect:/practise/" + var10001 + "/" + statusContent.getContent().getId());
@@ -194,9 +188,12 @@ public class UserController {
                     modelAndView.setViewName("user/levelNotFound");
                 } else {
                     List<Comment> comments = userService.getComments(content.getId());
+                    List<Vocabulary> vocabularies = userService.getVocabularies(content.getId(), user);
+
                     modelAndView.addObject("userId", userSession.getId());
                     modelAndView.addObject("comments", comments);
                     modelAndView.addObject("content", content);
+                    modelAndView.addObject("vocabularies", vocabularies);
                     modelAndView.setViewName("user/story/readingPage");
                     UserContent userContent = new UserContent(user, content, user.getLevel().equals(content.getLevel()) ? Progress.IN_PROGRESS : Progress.FINISHED);
                     CompletableFuture.runAsync(() -> userService.saveUserContent(userContent));
@@ -349,13 +346,13 @@ public class UserController {
             modelAndView.setViewName("redirect:/practise/stories/" + content.getId());
         } catch (RuntimeException e) {
             e.printStackTrace();
-            List<Vocabulary> vocabularies = userService.getVocabularies(content.getId(), user);
-            List<Comment> comments = userService.getComments(content.getId());
+            /*List<Vocabulary> vocabularies = userService.getVocabularies(vocabId, user);
+            List<Comment> comments = userService.getComments(vocabId);
             modelAndView.addObject("userId", userSession.getId());
             modelAndView.addObject("vocabularies", vocabularies);
             modelAndView.addObject("comments", comments);
-            modelAndView.addObject("content", content);
-            modelAndView.setViewName("user/story/readingPage");
+            modelAndView.addObject("content", content);*/
+            modelAndView.setViewName("redirect:/practise/stories/" + vocabId);
         }
         return modelAndView;
     }
@@ -380,13 +377,8 @@ public class UserController {
             userService.deleteVocabulary(userSession.getId(), vocabulary);
             modelAndView.setViewName("redirect:/practise/stories/" + content.getId());
         } catch (Exception e) {
-            List<Comment> comments = userService.getComments(content.getId());
-            List<Vocabulary> vocabularies = userService.getVocabularies(content.getId(), user);
-            modelAndView.addObject("userId", userSession.getId());
-            modelAndView.addObject("vocabularies", vocabularies);
-            modelAndView.addObject("comments", comments);
-            modelAndView.addObject("content", content);
-            modelAndView.setViewName("user/story/readingPage");
+            e.printStackTrace();
+            modelAndView.setViewName("redirect:/practise/stories/" + content.getId());
         }
         return modelAndView;
     }

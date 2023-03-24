@@ -1,10 +1,7 @@
 package com.tafakkoor.e_learn.domain;
 
 import com.tafakkoor.e_learn.enums.Progress;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -16,10 +13,10 @@ import lombok.*;
 @Entity
 public class UserContent extends Auditable {
     @JoinColumn(name = "auth_user_id")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private AuthUser user;
     @JoinColumn(name = "content_id")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Content content;
     @Column(nullable = false)
     @Builder.Default
