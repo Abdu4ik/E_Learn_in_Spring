@@ -1,0 +1,111 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+>
+<head >
+  <title>Teacher Page</title>
+  <style>
+    .container1{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card1 {
+      margin-right: 24px;
+      box-sizing: border-box;
+      width: 250px;
+      height: 450px;
+      background: rgba(217, 217, 217, 0.58);
+      border: 1px solid white;
+      box-shadow: 12px 17px 51px rgba(0, 0, 0, 0.22);
+      backdrop-filter: blur(6px);
+      border-radius: 17px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.5s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      font-weight: bolder;
+    }
+
+    .card2 {
+      margin-left: 24px;
+      box-sizing: border-box;
+      width: 250px;
+      height: 450px;
+      background: rgba(217, 217, 217, 0.58);
+      border: 1px solid white;
+      box-shadow: 12px 17px 51px rgba(0, 0, 0, 0.22);
+      backdrop-filter: blur(6px);
+      border-radius: 17px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.5s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      font-weight: bolder;
+    }
+
+    .card1:hover {
+      border: 1px solid black;
+      transform: scale(1.05);
+    }
+
+    .card1:active {
+      transform: scale(0.95) rotateZ(1.7deg);
+    }
+
+    .card2:hover {
+      border: 1px solid black;
+      transform: scale(1.05);
+    }
+
+    .card2:active {
+      transform: scale(0.95) rotateZ(1.7deg);
+    }
+  </style>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+</head>
+
+
+
+<body>
+<div class="container" style="align-content: center;background-color: #d9d9d993;margin-top: 20px">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <p class="navbar-brand" >Teacher</p>
+    </div>
+  </nav>
+</div>
+
+
+<div class="container1">
+
+  <form>
+    <div class="card1">
+      <a th:href="@{/teacher/reading}">Reading</a>
+    </div>
+  </form>
+
+  <form>
+    <div class="card2">
+      <a th:href="@{/teacher/grammar}">Grammar</a>
+    </div>
+  </form>
+
+
+</div>
+
+
+
+
+
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

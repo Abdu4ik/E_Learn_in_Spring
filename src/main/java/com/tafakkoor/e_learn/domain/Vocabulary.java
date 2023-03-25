@@ -14,10 +14,12 @@ import lombok.*;
 public class Vocabulary extends Auditable {
     @JoinColumn(nullable = false)
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Content story;
 
     @JoinColumn(nullable = false)
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private AuthUser authUser;
     @Column(nullable = false)
     private String word;

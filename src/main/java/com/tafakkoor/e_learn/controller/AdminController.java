@@ -45,6 +45,7 @@ public class AdminController {
             // invalidate user's session
             List<SessionInformation> sessions = sessionRegistry.getAllSessions(id, true);
             for (SessionInformation session : sessions) {
+                System.out.println("session = " + session);
                 session.expireNow();
             }
         }

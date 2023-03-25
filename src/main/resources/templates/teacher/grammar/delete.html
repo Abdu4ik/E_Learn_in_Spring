@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Page</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .card {
+            width: 600px;
+            height: 280px;
+            background: linear-gradient(135deg, #ebadb6 0%, #aceae1 100%);
+            border-radius: 7px;
+            box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card col-md-6 mx-auto" style="margin-top: 60px">
+    <div class="row">
+        <div class="col-md-10 offset-1" style="margin-top: 8px">
+            <div class="alert alert-danger">
+                <table class="table">
+                    <thead class="table-light">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Author</th>
+                        <th scope="col">Level</th>
+                        <th scope="col">Score</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td th:text="${grammar.id}"></td>
+                        <td th:text="${grammar.title}"></td>
+                        <td th:text="${grammar.author}"></td>
+                        <td th:text="${grammar.level}"></td>
+                        <td th:text="${grammar.score}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+
+                <h1>Are you sure delete this content?</h1>
+            </div>
+            <form th:action="@{'/teacher/grammar/delete/'+${grammar.id}}" method="post">
+                <a href="/teacher/grammar" class="btn btn-success">Back</a>
+                <button type="submit" class="btn btn-danger">DELETE</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

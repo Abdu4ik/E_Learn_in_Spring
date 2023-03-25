@@ -3,6 +3,8 @@ package com.tafakkoor.e_learn.domain;
 import com.tafakkoor.e_learn.enums.Levels;
 import com.tafakkoor.e_learn.enums.Status;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -21,24 +23,12 @@ public class AuthUser extends Auditable {
     @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @ToString.Exclude
     private Image image;
-    //    @NotBlank(message = "Username cannot be blank")
-//    @Pattern(regexp="^\\S+$", message="Username cannot contain whitespace")
-//    @Pattern(regexp="^[a-zA-Z0-9_]{3,15}$", message="Invalid username")
     @Column(unique = true, nullable = false)
     private String username;
-    //    @NotBlank(message = "Password cannot be blank")
-//    @Pattern(regexp="^\\S+$", message="Password cannot contain whitespace")
-//    @Pattern(regexp="^(?=.*[0-9])(?=.*[a-z]).{8,}$", message="Choose a stronger password")
     @Column(nullable = false)
     private String password;
-    //    @NotBlank(message = "First name cannot be blank")
-//    @Pattern(regexp="^[a-zA-Z]{2,30}$", message="Invalid first name")
     private String firstName;
-    //    @NotBlank(message = "Last name cannot be blank")
-//    @Pattern(regexp="^[a-zA-Z]{2,30}$", message="Invalid last name")
     private String lastName;
-    //    @NotBlank(message = "Email cannot be blank")
-//    @Pattern(regexp="^[A-Za-z0-9+_.-]+@(.+)$", message="Invalid email")
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -59,9 +49,7 @@ public class AuthUser extends Auditable {
     private LocalDate birthDate;
     private LocalDateTime lastLogin;
     @Column(nullable = false, columnDefinition = "integer default 0")
-    @Builder.Default
-    private Integer score = 0;
-    @Column(columnDefinition = "boolean default false")
+    private Integer score;
     private boolean isOAuthUser;
 
 }

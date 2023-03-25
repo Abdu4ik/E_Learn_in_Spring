@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .btn {
+            padding: 0.9em 1.6em;
+            border: none;
+            outline: none;
+            color: #FFF;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 17px;
+            cursor: pointer;
+            position: relative;
+            z-index: 0;
+            border-radius: 12px;
+        }
+
+        .btn::after {
+            content: "";
+            z-index: -1;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(171, 220, 175);
+            left: 0;
+            top: 0;
+            border-radius: 10px;
+        }
+
+        /* glow */
+        .btn::before {
+            content: "";
+            background: linear-gradient(
+                    45deg,
+                    #FF0000, #002BFF, #FF00C8, #002BFF,
+                    #FF0000, #002BFF, #FF00C8, #002BFF
+            );
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            background-size: 600%;
+            z-index: -1;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            filter: blur(8px);
+            animation: glowing 20s linear infinite;
+            transition: opacity .3s ease-in-out;
+            border-radius: 10px;
+            opacity: 0;
+        }
+
+        @keyframes glowing {
+            0% {
+                background-position: 0 0;
+            }
+
+            50% {
+                background-position: 400% 0;
+            }
+
+            100% {
+                background-position: 0 0;
+            }
+        }
+
+        /* hover */
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        .btn:active:after {
+            background: transparent;
+        }
+
+        .btn:active {
+            color: #000;
+            font-weight: bold;
+        }
+
+
+
+        .add {
+            border: 2px solid #24b4fb;
+            background-color: #24b4fb;
+            border-radius: 0.9em;
+            padding: 0.8em 1.2em 0.8em 1em;
+            transition: all ease-in-out 0.2s;
+            font-size: 16px;
+        }
+
+        .add span {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .add:hover {
+            background-color: #0071e2;
+        }
+
+
+        .wrapper {
+            width: 800px;
+            margin: 150px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0px 10px 40px 0px rgba(47, 47, 47, .1);
+        }
+    </style>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <title>Grammar topics</title>
+</head>
+<body>
+<br><br><br>
+<div style="margin-left: 10%">
+    <a href="/teacher" class="btn btn-primary" style="margin-left: fill"> Back </a>
+</div>
+<br><br>
+<div class="container">
+    <h1 style="text-align: center; background-color: #20c997; border-radius: 20px">Grammar topics</h1>
+
+    <button class="add" onclick="location.href='/teacher/grammar/create'" type="submit">
+  <span>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none"
+                                                                                             d="M0 0h24v24H0z"></path><path
+            fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"></path></svg> Create
+  </span>
+    </button>
+</div>
+<div th:if="${grammars.size()==0}" class="wrapper" style="background-color: palevioletred">
+    <h1 style="text-align: center">There are no reading topics found!</h1>
+</div>
+<div th:unless="${grammars.size()==0}">
+
+
+    <table style="border-radius: 5px" class="table table-striped container">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Level</th>
+            <th>Score</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="grammar, counter:${grammars}">
+            <td th:text="${counter.count}"></td>
+            <td th:text="${grammar.title}"></td>
+            <td th:text="${grammar.author}"></td>
+            <td th:text="${grammar.level}"></td>
+            <td th:text="${grammar.score}"></td>
+            <td>
+                <div style="display: flex">
+                    <div style="margin-left: 2px">
+                        <a th:href="@{'/teacher/grammar/update/'+${grammar.id}}" class="btn btn-primary" style="margin-left: fill"> UPDATE </a>
+                    </div>
+                    <div style="margin-left: 2px">
+                        <a th:href="@{'/teacher/grammar/delete/'+${grammar.id}}" class="btn btn-danger" style="margin-left: fill"> DELETE </a>
+                    </div>
+                    <div style="margin-left: 2px">
+                        <a th:href="@{'/teacher/grammar/question/'+${grammar.id}}" class="btn btn-warning" style="margin-left: fill"> Questions </a>
+                    </div>
+                </div>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

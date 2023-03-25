@@ -10,7 +10,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <title>Cyborg - Awesome HTML5 Template</title>
+    <title>Home</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
@@ -65,6 +65,7 @@ https://templatemo.com/tm-579-cyborg-gaming
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav" th:object="${user}">
                         <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}"><a href="/admin">Admin Page</a></li>
+                        <li th:if="${#authorization.expression('hasRole(''TEACHER'')')}"><a href="/teacher">Teacher Page</a></li>
                         <li><a href="/home" class="active">Home</a></li>
                         <li><a href="/practise">Practise</a></li>
                         <li><a href="/practise/story">Reading</a></li>

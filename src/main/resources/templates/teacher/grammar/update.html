@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Story Update</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+  <style>
+    .btn1 {
+      padding: 0.9em 1.6em;
+      border: none;
+      outline: none;
+      color: #FFF;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 17px;
+      cursor: pointer;
+      position: relative;
+      z-index: 0;
+      border-radius: 12px;
+    }
+
+    .btn1::after {
+      content: "";
+      z-index: -1;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: rgb(139, 14, 222);
+      left: 0;
+      top: 0;
+      border-radius: 10px;
+    }
+
+    /* glow */
+    .btn1::before {
+      content: "";
+      background: linear-gradient(
+              45deg,
+              #FF0000, #002BFF, #FF00C8, #002BFF,
+              #FF0000, #002BFF, #FF00C8, #002BFF
+      );
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      background-size: 600%;
+      z-index: -1;
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
+      filter: blur(8px);
+      animation: glowing 20s linear infinite;
+      transition: opacity .3s ease-in-out;
+      border-radius: 10px;
+      opacity: 0;
+    }
+
+    @keyframes glowing {
+      0% {
+        background-position: 0 0;
+      }
+
+      50% {
+        background-position: 400% 0;
+      }
+
+      100% {
+        background-position: 0 0;
+      }
+    }
+
+    /* hover */
+    .btn1:hover::before {
+      opacity: 1;
+    }
+
+    .btn1:active:after {
+      background: transparent;
+    }
+
+    .btn1:active {
+      color: #000;
+      font-weight: bold;
+    }
+
+    .btn {
+      padding: 0.9em 1.6em;
+      border: none;
+      outline: none;
+      color: #FFF;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 17px;
+      cursor: pointer;
+      position: relative;
+      z-index: 0;
+      border-radius: 12px;
+    }
+
+    .btn::after {
+      content: "";
+      z-index: -1;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: rgb(171, 220, 175);
+      left: 0;
+      top: 0;
+      border-radius: 10px;
+    }
+
+    /* glow */
+    .btn::before {
+      content: "";
+      background: linear-gradient(
+              45deg,
+              #FF0000, #002BFF, #FF00C8, #002BFF,
+              #FF0000, #002BFF, #FF00C8, #002BFF
+      );
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      background-size: 600%;
+      z-index: -1;
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
+      filter: blur(8px);
+      animation: glowing 20s linear infinite;
+      transition: opacity .3s ease-in-out;
+      border-radius: 10px;
+      opacity: 0;
+    }
+
+    @keyframes glowing {
+      0% {
+        background-position: 0 0;
+      }
+
+      50% {
+        background-position: 400% 0;
+      }
+
+      100% {
+        background-position: 0 0;
+      }
+    }
+
+    /* hover */
+    .btn:hover::before {
+      opacity: 1;
+    }
+
+    .btn:active:after {
+      background: transparent;
+    }
+
+    .btn:active {
+      color: #000;
+      font-weight: bold;
+    }
+    .wrapper{
+      width: 600px;
+      margin: 40px auto;
+      padding: 10px;
+      border-radius: 5px;
+      background: white;
+      box-shadow: 0px 10px 40px 0px rgba(47, 47, 47, .1);
+    }
+
+    bword[type="text"]{
+      padding: 10px;
+      margin: 10px auto;
+      display: block;
+      border-radius: 5px;
+      border: 1px solid lightgrey;
+      background: none;
+      width: 50px;
+      color: black;
+    }
+    input[type="text"]:focus{
+      outline: none;
+    }
+    .controls a i fa-minus{
+      margin-right: 5px;
+    }
+
+    a{
+      color: black;
+      text-decoration: none;
+    }
+    h1{
+      text-align: center;
+      font-size: 48px;
+      color: #232c3d;
+    }
+
+    .card {
+      width: 1000px;
+      height: 480px;
+      background: linear-gradient(135deg, #ebadb6 0%, #aceae1 100%);
+      border-radius: 20px;
+      box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff    ;
+    }
+  </style>
+</head>
+<body>
+<br><br><br>
+<div style="margin-left: 10%">
+  <a href="/teacher/grammar" class="btn btn-primary" style="margin-left: fill"> Back </a>
+</div>
+<br><br>
+
+<div class="card col-md-6 mx-auto" style="margin-top: 60px">
+  <div>
+    <form class="row g-3" method="post" enctype="multipart/form-data">
+      <div class="col-md-5 offset-1">
+        <label for="validationServer01" class="form-label">Title</label>
+        <input type="text" class="form-control is-valid" id="validationServer01" name="title"
+               th:value="${grammar.title}" required>
+        <div class="invalid-feedback">
+          Looks good!
+        </div>
+      </div>
+      <div class="col-md-4 offset-1">
+        <label for="validationServer02" class="form-label">Author(s)</label>
+        <input type="text" class="form-control is-valid" id="validationServer02" name="author"
+               th:value="${grammar.author}" required>
+        <div class="invalid-feedback">
+          Looks good!
+        </div>
+      </div>
+      <div class="col-md-4 offset-1">
+        <label for="validationServer03" class="form-label">Score</label>
+        <input type="number" class="form-control is-valid" id="validationServer03" name="score"
+               th:value="${grammar.score}" required>
+      </div>
+
+
+      <div class="col-md-4 offset-1">
+        <label for="validationServer04" class="form-label">Select level</label>
+        <select name="level" id="validationServer04" required>
+          <th:block th:each="level, counter: ${levels}">
+            <option th:text="${level}"></option>
+          </th:block>
+        </select>
+      </div>
+      <div class="col-md-3 offset-1">
+        <label for="file" class="form-label">Upload the new PDF file of the grammar</label>
+        <input type="file" class="form-control" id="file" name="file" aria-label="file example" required>
+        <div class="invalid-feedback">Example invalid form file feedback</div>
+      </div>
+
+      <div class="col-12 offset-1 ">
+        <button class="btn1" type="submit">Update grammar</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Grammar Create</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <style>
+
+        .btn1 {
+            padding: 0.9em 1.6em;
+            border: none;
+            outline: none;
+            color: #FFF;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 17px;
+            cursor: pointer;
+            position: relative;
+            z-index: 0;
+            border-radius: 12px;
+        }
+
+        .btn1::after {
+            content: "";
+            z-index: -1;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(85, 152, 199);
+            left: 0;
+            top: 0;
+            border-radius: 10px;
+        }
+
+        /* glow */
+        .btn1::before {
+            content: "";
+            background: linear-gradient(
+                    45deg,
+                    #FF0000, #002BFF, #FF00C8, #002BFF,
+                    #FF0000, #002BFF, #FF00C8, #002BFF
+            );
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            background-size: 600%;
+            z-index: -1;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            filter: blur(8px);
+            animation: glowing 20s linear infinite;
+            transition: opacity .3s ease-in-out;
+            border-radius: 10px;
+            opacity: 0;
+        }
+
+        @keyframes glowing {
+            0% {
+                background-position: 0 0;
+            }
+
+            50% {
+                background-position: 400% 0;
+            }
+
+            100% {
+                background-position: 0 0;
+            }
+        }
+
+        /* hover */
+        .btn1:hover::before {
+            opacity: 1;
+        }
+
+        .btn1:active:after {
+            background: transparent;
+        }
+
+        .btn1:active {
+            color: #000;
+            font-weight: bold;
+        }
+
+        .btn {
+            padding: 0.9em 1.6em;
+            border: none;
+            outline: none;
+            color: #FFF;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 17px;
+            cursor: pointer;
+            position: relative;
+            z-index: 0;
+            border-radius: 12px;
+        }
+
+        .btn::after {
+            content: "";
+            z-index: -1;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(171, 220, 175);
+            left: 0;
+            top: 0;
+            border-radius: 10px;
+        }
+
+        /* glow */
+        .btn::before {
+            content: "";
+            background: linear-gradient(
+                    45deg,
+                    #FF0000, #002BFF, #FF00C8, #002BFF,
+                    #FF0000, #002BFF, #FF00C8, #002BFF
+            );
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            background-size: 600%;
+            z-index: -1;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            filter: blur(8px);
+            animation: glowing 20s linear infinite;
+            transition: opacity .3s ease-in-out;
+            border-radius: 10px;
+            opacity: 0;
+        }
+
+        @keyframes glowing {
+            0% {
+                background-position: 0 0;
+            }
+
+            50% {
+                background-position: 400% 0;
+            }
+
+            100% {
+                background-position: 0 0;
+            }
+        }
+
+        /* hover */
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        .btn:active:after {
+            background: transparent;
+        }
+
+        .btn:active {
+            color: #000;
+            font-weight: bold;
+        }
+
+        .wrapper {
+            width: 300px;
+            margin: 40px auto;
+            padding: 10px;
+            border-radius: 5px;
+            background: white;
+            box-shadow: 0px 10px 40px 0px rgba(47, 47, 47, .1);
+        }
+
+
+        input[type="text"]:focus {
+            outline: none;
+        }
+
+        .controls {
+            width: 150px;
+            margin: 15px auto;
+        }
+
+        #remove_fields {
+            float: right;
+        }
+
+        .controls a i fa-minus {
+            margin-right: 5px;
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            color: #232c3d;
+        }
+
+        .card {
+            width: 800px;
+            height: 450px;
+            background: linear-gradient(135deg, #ebadb6 0%, #aceae1 100%);
+            border-radius: 20px;
+            box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+        }
+    </style>
+</head>
+<body>
+<br>
+<div style="margin-left: 10%">
+    <a th:href="@{/teacher/grammar/question/{id}(id=${grammarId})}" class="btn btn-primary" style="margin-left: fill"> Back </a>
+</div>
+<div class="card col-md-6 mx-auto" style="margin-top: 30px">
+    <div>
+        <form class="row g-3" th:href="@{/teacher/grammar/question/create/{id}(id=${grammarId})}" method="post"  >
+
+            <div class="wrapper" style="background-color: white">
+
+                <label for="title" class="form-label">Insert question</label>
+                <textarea style="background-color: whitesmoke" type="text" class="form-control is-valid" id="title"
+                          name="title" placeholder="Enter question" required></textarea>
+            </div>
+            <div class="wrapper col-auto" style="background-color: white">
+                <div class="d-inline-block">
+                    <input style="background-color: whitesmoke" type="text" class="form-control " id="option1"
+                           name="option1" placeholder="Enter option 1" required>
+                    <input style="background-color: whitesmoke" type="text" class="form-control " id="option2"
+                           name="option2" placeholder="Enter option 2" required>
+                    <input style="background-color: whitesmoke" type="text" class="form-control " id="option3"
+                           name="option3" placeholder="Enter option 3" required>
+                    <input style="background-color: whitesmoke" type="text" class="form-control " id="option4"
+                           name="option4" placeholder="Enter option 4" required>
+                    <label for="correctAnswer" class="form-label">Choose correct answer</label>
+                    <select id="correctAnswer" class="form-control is-valid" name="correctAnswer" required>
+                        <option selected="true" disabled="disabled">Select a Option</option>
+                        <option value="2">Option 2</option>
+                        <option value="1">Option 1</option>
+                        <option value="4">Option 4</option>
+                        <option value="3">Option 3</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="col-md-4 offset-1">
+                <button class="btn1" type="submit">Add question</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+</body>
+</html>

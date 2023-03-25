@@ -4,9 +4,12 @@ import com.google.gson.Gson;
 import com.tafakkoor.e_learn.domain.AuthUser;
 import com.tafakkoor.e_learn.domain.Token;
 import com.tafakkoor.e_learn.enums.Levels;
+import org.springframework.lang.NonNull;
+import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class Util {
     private static final ThreadLocal<Util> UTIL_THREAD_LOCAL = ThreadLocal.withInitial(Util::new);
@@ -18,6 +21,10 @@ public class Util {
                 .user(authUser)
                 .validTill(LocalDateTime.now().plusMinutes(10))
                 .build();
+    }
+
+    public String generateUniqueName(@NonNull String fileName) {
+        return UUID.randomUUID() + "." + StringUtils.getFilenameExtension(fileName);
     }
 
     public String generateBody(String username, String token) {

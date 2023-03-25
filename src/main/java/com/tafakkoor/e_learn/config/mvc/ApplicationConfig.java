@@ -22,6 +22,6 @@ public class ApplicationConfig extends AbstractAnnotationConfigDispatcherServlet
 
     @Override
     protected void customizeRegistration(ServletRegistration.Dynamic registration) {
-        registration.setMultipartConfig(new MultipartConfigElement("/home/jlkesh/to_remove"));  // TODO: 3/15/23 change the upload location
+        registration.setMultipartConfig(new MultipartConfigElement("/home/tafakkoor/to_remove"));  // TODO: 3/15/23 change the upload location
     }
 }

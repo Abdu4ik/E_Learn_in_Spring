@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Page</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .card {
+            width: 600px;
+            height: 280px;
+            background: linear-gradient(135deg, #ebadb6 0%, #aceae1 100%);
+            border-radius: 7px;
+            box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card col-md-6 mx-auto" style="margin-top: 60px">
+    <div class="row">
+        <div class="d-inline-block col-md-10 offset-1" style="margin-top: 8px">
+            <div class="alert alert-danger">
+                <h1>Are you sure delete this question?</h1>
+            </div>
+            <div style="display: flex; margin-left: 8px">
+                <div>
+                    <a th:href="@{/teacher/grammar/question/{grammarId}(grammarId=${grammarId})}" type="submit" class="btn btn-success">Back</a>
+                </div>
+                <form method="post">
+                    <input type="hidden" name="grammarId" id="grammarId" th:value="${grammarId}">
+                    <button th:href="@{/teacher/grammar/question/delete/{questionId}(questionId=${questionId})}" type="submit" class="btn btn-danger"> DELETE </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

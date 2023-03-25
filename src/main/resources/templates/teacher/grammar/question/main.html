@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <style>
+
+    .btn2 {
+      background-color: transparent;
+      position: relative;
+      border: none;
+    }
+
+    .btn::after {
+      content: 'delete';
+      position: absolute;
+      top: -130%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: fit-content;
+      height: fit-content;
+      background-color: rgb(168, 7, 7);
+      padding: 4px 8px;
+      border-radius: 5px;
+      transition: .2s linear;
+      transition-delay: .2s;
+      color: white;
+      text-transform: uppercase;
+      font-size: 12px;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .icon {
+      transform: scale(1.2);
+      transition: .2s linear;
+    }
+
+    .btn2:hover > .icon {
+      transform: scale(1.5);
+    }
+
+    .btn2:hover > .icon path {
+      fill: rgb(168, 7, 7);
+    }
+
+    .btn2:hover::after {
+      visibility: visible;
+      opacity: 1;
+      top: -160%;
+    }
+
+    .btn {
+      padding: 0.9em 1.6em;
+      border: none;
+      outline: none;
+      color: #FFF;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 17px;
+      cursor: pointer;
+      position: relative;
+      z-index: 0;
+      border-radius: 12px;
+    }
+
+    .btn::after {
+      content: "";
+      z-index: -1;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: rgb(171, 220, 175);
+      left: 0;
+      top: 0;
+      border-radius: 10px;
+    }
+
+    /* glow */
+    .btn::before {
+      content: "";
+      background: linear-gradient(
+              45deg,
+              #FF0000, #002BFF, #FF00C8, #002BFF,
+              #FF0000, #002BFF, #FF00C8, #002BFF
+      );
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      background-size: 600%;
+      z-index: -1;
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
+      filter: blur(8px);
+      animation: glowing 20s linear infinite;
+      transition: opacity .3s ease-in-out;
+      border-radius: 10px;
+      opacity: 0;
+    }
+
+    @keyframes glowing {
+      0% {
+        background-position: 0 0;
+      }
+
+      50% {
+        background-position: 400% 0;
+      }
+
+      100% {
+        background-position: 0 0;
+      }
+    }
+
+    /* hover */
+    .btn:hover::before {
+      opacity: 1;
+    }
+
+    .btn:active:after {
+      background: transparent;
+    }
+
+    .btn:active {
+      color: #000;
+      font-weight: bold;
+    }
+
+
+
+    .add {
+      border: 2px solid #24b4fb;
+      background-color: #24b4fb;
+      border-radius: 0.9em;
+      padding: 0.8em 1.2em 0.8em 1em;
+      transition: all ease-in-out 0.2s;
+      font-size: 16px;
+    }
+
+    .add span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .add:hover {
+      background-color: #0071e2;
+    }
+
+
+    .wrapper {
+      width: 400px;
+      margin: 150px auto;
+      padding: 20px;
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0px 10px 40px 0px rgba(47, 47, 47, .1);
+    }
+  </style>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <title>Grammar topics</title>
+</head>
+<body>
+<br><br><br>
+<div style="margin-left: 10%">
+  <a href="/teacher/grammar" class="btn btn-primary" style="margin-left: fill"> Back </a>
+</div>
+<br><br>
+<div class="container">
+  <h1 style="text-align: center; background-color: #20c997; border-radius: 20px">Questions</h1>
+
+  <a class="add" th:href="@{/teacher/grammar/question/create/{id}(id=${grammarId})}" type="submit">
+  <span>
+     Create
+  </span>
+  </a>
+</div>
+<div th:if="${questions.size()==0}" class="wrapper" style="background-color: palevioletred">
+  <h1 style="text-align: center">There are no questions found!</h1>
+</div>
+<div th:unless="${questions.size()==0}">
+
+
+  <table style="border-radius: 5px" class="table table-striped container">
+    <thead>
+    <tr>
+      <th></th>
+      <th>Title</th>
+      <th>Option</th>
+      <th>Option</th>
+      <th>Option</th>
+      <th>Option</th>
+      <th> </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="question, counter:${questions}">
+      <td th:text="${counter.count}"></td>
+      <td th:text="${question.title}"></td>
+      <td th:text="${question.option1}"></td>
+      <td th:text="${question.option2}"></td>
+      <td th:text="${question.option3}"></td>
+      <td th:text="${question.option4}"></td>
+      <td>
+        <a th:href="@{/teacher/grammar/question/delete/{id}(id=${question.questionId})}" class="btn2">
+          <svg viewBox="0 0 15 17.5" height="17.5" width="15" xmlns="http://www.w3.org/2000/svg" class="icon">
+            <path transform="translate(-2.5 -1.25)" d="M15,18.75H5A1.251,1.251,0,0,1,3.75,17.5V5H2.5V3.75h15V5H16.25V17.5A1.251,1.251,0,0,1,15,18.75ZM5,5V17.5H15V5Zm7.5,10H11.25V7.5H12.5V15ZM8.75,15H7.5V7.5H8.75V15ZM12.5,2.5h-5V1.25h5V2.5Z" id="Fill"></path>
+          </svg>
+        </a>
+
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

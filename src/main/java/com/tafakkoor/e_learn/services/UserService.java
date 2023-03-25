@@ -93,6 +93,7 @@ public class UserService {
                 .lastName(dto.getLastname())
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .email(dto.getEmail().toLowerCase())
+                .score(0)
                 .build();
         userRepository.save(user);
         sendActivationEmail(user);
@@ -102,13 +103,13 @@ public class UserService {
         Util util = Util.getInstance();
         String token = tokenService.generateToken();  // TODO: 3/12/23 encrypt token
         String email = authUser.getEmail();
-        String body = util.generateBody(authUser.getUsername(), token);
+        String body = util.generateBody(authUser.getFirstName().concat(" ").concat(authUser.getLastName()), token);
         tokenService.save(util.buildToken(token, authUser));
         CompletableFuture.runAsync(() -> EmailService.getInstance().sendEmail(email, body, "Activation Email"));
     }
 
 
-    public List<Content> getContentsStories(Levels level, Long id) throws RuntimeException {
+    public List<Content> getContentsStories(Levels level, Long id) throws RuntimeException{
         UserContent userContent = checkUserStatus(id);
         if (userContent != null) {
             Content content = userContent.getContent();
@@ -442,6 +443,12 @@ public class UserService {
         user.setUsername(dto.username());
         user.setBirthDate(dto.birthDate());
         userRepository.save(user);
+    }
+
+    public List<Levels> getAllLevels() {
+        Levels[] levels = Levels.values();
+        List<Levels> levelsList = Arrays.stream(levels).toList();
+        return levelsList;
     }
 
     public String getSessionId(Long userId, HttpServletRequest request) {

@@ -33,17 +33,14 @@ public class OAuthLoginController {
     private final Environment env;
     private static final String authorizationRequestBaseUri
             = "oauth2/authorization";
-    Map<String, String> oauth2AuthenticationUrls
-            = new HashMap<>();
+    Map<String, String> oauth2AuthenticationUrls = new HashMap<>();
     private final ClientRegistrationRepository clientRegistrationRepository;
-//    private final OAuth2AuthorizedClientService authorizedClientService;
 
     private final UserService userService;
     private final OAuthLoginService oAuthLoginService;
 
     public OAuthLoginController(ClientRegistrationRepository clientRegistrationRepository /*OAuth2AuthorizedClientService authorizedClientService*/, AuthUserRepository authUserRepository, AuthenticationManager authenticationManager, Environment env, UserService userService, OAuthLoginService oAuthLoginService) {
         this.clientRegistrationRepository = clientRegistrationRepository;
-//        this.authorizedClientService = authorizedClientService;
         this.authenticationManager = authenticationManager;
         this.env = env;
         this.userService = userService;

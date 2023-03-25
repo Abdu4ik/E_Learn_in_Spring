@@ -13,7 +13,7 @@ import lombok.*;
 public class Options extends Auditable {
     @Column(nullable = false)
     private String value;
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Column(nullable = false)
     private boolean isCorrect;
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Questions questions;

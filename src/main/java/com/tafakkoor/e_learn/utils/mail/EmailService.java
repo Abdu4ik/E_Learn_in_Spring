@@ -47,6 +47,7 @@ public class EmailService {
 
 
     public static void main(String[] args) {
-
+        EmailService emailService = EmailService.getInstance();
+        emailService.sendEmail("strengthnumberone@gmail.com", "Hi", "Hi");
     }
 }
