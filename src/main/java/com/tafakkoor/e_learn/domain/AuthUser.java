@@ -49,7 +49,8 @@ public class AuthUser extends Auditable {
     private LocalDate birthDate;
     private LocalDateTime lastLogin;
     @Column(nullable = false, columnDefinition = "integer default 0")
-    private Integer score;
+    @Builder.Default
+    private Integer score = 0;
     private boolean isOAuthUser;
 
 }
